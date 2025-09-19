@@ -20,7 +20,7 @@ const handleRegister = async (req, res) => {
     upperCaseAlphabets: false,
     specialChars: false,
   });
-  const hashedOTP = await bcrypt.hash(opt, 10);
+  const hashedOTP = await bcrypt.hash(otp, 10);
   const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
   const alreadyRegistered = await PendingUser.findOne({ email: email });
@@ -37,7 +37,7 @@ const handleRegister = async (req, res) => {
         userName,
         email,
         password: hashedPassword,
-        opt: hashedOTP,
+        otp: hashedOTP,
         otp_expiry: otpExpiry,
       });
       const { password, ...responseObject } = result.toObject();

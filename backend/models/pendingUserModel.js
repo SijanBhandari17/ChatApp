@@ -4,7 +4,7 @@ const pendingUserSchema = new mongoose.Schema({
   email: { type: String, required: true },
   userName: { type: String, required: true },
   password: { type: String, required: true },
-  otp: { type: Number, requried: true },
+  otp: { type: String, requried: true },
   otp_expiry: { type: Date, required: true },
 });
 
