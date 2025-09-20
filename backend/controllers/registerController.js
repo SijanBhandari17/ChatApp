@@ -14,38 +14,55 @@ const handleRegister = async (req, res) => {
   const cleanData = matchedData(req);
 
   const { userName, email, password } = cleanData;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const otp = otpGenerator.generate(6, {
-    lowerCaseAlphabets: false,
-    upperCaseAlphabets: false,
-    specialChars: false,
-  });
-  const hashedOTP = await bcrypt.hash(otp, 10);
-  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
   const alreadyRegistered = await PendingUser.findOne({ email: email });
 
-  if (alreadyRegistered)
+  if (alreadyRegistered) {
+    const passwordMatch = await bcrypt.compare(password, alreadyRegistered.password);
+    if (passwordMatch) {
+      return handleValidRegisteration(cleanData, res, true);
+    }
     return res
       .status(409)
       .json({ error: 'Email already registered. Please login or use password recovery' });
+  }
+  handleValidRegisteration(cleanData, res, false);
+};
 
+const handleValidRegisteration = async ({ userName, email, password }, res, updateUser) => {
   try {
+    const otp = otpGenerator.generate(6, {
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const hashedOTP = await bcrypt.hash(otp, 10);
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
     const OTPresult = await sendOTP(otp, email);
-    if (OTPresult) {
-      const result = await PendingUser.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+    if (!OTPresult) {
+      return res.status(500).json({ error: 'Failed to send OTP' });
+    }
+    let result;
+    if (updateUser) {
+      result = await PendingUser.findOneAndUpdate(
+        { email },
+        { otp: hashedOTP, otp_expiry: otpExpiry },
+      );
+    } else {
+      result = await PendingUser.create({
         userName,
         email,
         password: hashedPassword,
         otp: hashedOTP,
         otp_expiry: otpExpiry,
       });
-      const { password, ...responseObject } = result.toObject();
-      console.log('Otp send vayo');
-      return res
-        .status(200)
-        .json({ message: 'An Otp has been sent to your email', body: responseObject });
     }
+    const { password: _, ...responseObject } = result.toObject();
+    console.log('Otp send vayo');
+    return res
+      .status(200)
+      .json({ message: 'An Otp has been sent to your email', body: responseObject });
   } catch (err) {
     return res.status(500).json({ error: `An error encountered ${err}` });
   }

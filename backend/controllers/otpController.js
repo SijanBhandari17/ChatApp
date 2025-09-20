@@ -6,7 +6,6 @@ const handleOTP = async (req, res) => {
   const { email, otp } = req.body;
   try {
     const pendingUser = await PendingUser.findOne({ email });
-    console.log(pendingUser);
     if (!pendingUser) return res.status(400).json({ error: 'Otp is invalid' });
 
     if (pendingUser.otp_expiry < Date.now())
@@ -21,7 +20,7 @@ const handleOTP = async (req, res) => {
 
     res.status(201).json({ message: 'User created successfully', body: newUser });
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message });
   }
 };
 
