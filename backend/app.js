@@ -4,6 +4,7 @@ const express = require('express');
 const connectDb = require('./config/database');
 const { default: mongoose } = require('mongoose');
 const RegisterRouter = require('./routes/registerRoutes');
+const LoginRouter = require('./routes/loginRoutes');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/register', RegisterRouter);
+app.use('/login', LoginRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello');
