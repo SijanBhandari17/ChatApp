@@ -1,7 +1,13 @@
 const jwt = require('jsonwebtoken');
 
 const generateJWT = ({ userName, email }) => {
-  const accessToken = jwt.sign(
+  const accessToken = generateAccesToken({ userName, email });
+  const refreshToken = generateRefreshToken({ userName, email });
+  return { accessToken, refreshToken };
+};
+
+const generateAccesToken = ({ userName, email }) => {
+  return jwt.sign(
     {
       email,
       userName,
@@ -11,8 +17,10 @@ const generateJWT = ({ userName, email }) => {
       expiresIn: '10m',
     },
   );
+};
 
-  const refreshToken = jwt.sign(
+const generateRefreshToken = ({ userName, email }) => {
+  return jwt.sign(
     {
       userName,
       email,
@@ -22,7 +30,6 @@ const generateJWT = ({ userName, email }) => {
       expiresIn: '1d',
     },
   );
-  return { accessToken, refreshToken };
 };
 
 module.exports = generateJWT;

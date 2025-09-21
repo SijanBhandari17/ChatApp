@@ -13,7 +13,7 @@ const handleRegister = async (req, res) => {
 
   const cleanData = matchedData(req);
 
-  const { userName, email, password } = cleanData;
+  const { email, password } = cleanData;
 
   const alreadyRegistered = await PendingUser.findOne({ email: email });
 
@@ -26,7 +26,7 @@ const handleRegister = async (req, res) => {
       .status(409)
       .json({ error: 'Email already registered. Please login or use password recovery' });
   }
-  handleValidRegisteration(cleanData, res, false);
+  return handleValidRegisteration(cleanData, res, false);
 };
 
 const handleValidRegisteration = async ({ userName, email, password }, res, updateUser) => {

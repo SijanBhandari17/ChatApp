@@ -22,9 +22,8 @@ const handleLogin = async (req, res) => {
 
     user.refresh_token = refreshToken;
     await user.save();
-    const { password: _, refresh_token, ...userObject } = user.toObject();
-    const responseObject = { ...userObject, accessToken: accessToken };
-    return res.status(200).json({ message: 'Successful login', body: responseObject });
+    const { password: _, refresh_token, ...userData } = user.toObject();
+    return res.status(200).json({ message: 'Successful login', body: usrData, accessToken });
   } catch (err) {
     return res.status(500).json({ error: `An error encountered ${err.message}` });
   }
