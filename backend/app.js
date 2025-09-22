@@ -8,6 +8,7 @@ const LoginRouter = require('./routes/loginRoutes');
 const RefreshRouter = require('./routes/refreshroute');
 const HomeRouter = require('./routes/homeRoutes');
 const cookieParser = require('cookie-parser');
+const LogoutRouter = require('./routes/logoutRoutes');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -22,6 +23,7 @@ app.use('/register', RegisterRouter);
 app.use('/login', LoginRouter);
 app.use('/refresh', RefreshRouter);
 app.use('/home', HomeRouter);
+app.use('/logout', LogoutRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello');
