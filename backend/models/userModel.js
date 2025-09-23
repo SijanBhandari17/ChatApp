@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   last_active_at: { type: Date, default: Date.now },
 });
 
+userSchema.index({ email: 1 }, { unique: true });
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
