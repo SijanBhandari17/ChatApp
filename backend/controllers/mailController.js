@@ -35,7 +35,6 @@ const sendOTP = async (otpGenerated, recipientEmail) => {
 };
 
 const sendResetLink = async (recipientEmail, resetLink) => {
-  console.log(recipientEmail);
   const transporter = nodemailer.createTransport(generateTransporter());
   const mailOptions = {
     from: process.env.NODEMAILER_ACCOUNT,

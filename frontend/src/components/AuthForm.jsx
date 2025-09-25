@@ -12,15 +12,12 @@ const AuthForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     <div className="container flex min-h-screen items-center justify-center">
-      <div className="max-w-md space-y-4">
+      <div className="w-sm space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-2">
             <MessageSquare className="h-6 w-6" />
             <h1 className="text-2xl font-bold">ConnectNow</h1>
           </div>
-          <p className="text-muted-foreground">
-            Welcome back! Sign in to continue your conversations.
-          </p>
         </div>
 
         <Tabs defaultValue="signin">

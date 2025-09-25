@@ -14,7 +14,6 @@ const handlePasswordReset = async (req, res) => {
 
   try {
     const resetRecord = await forgotPassword.findOne({ userId: id });
-    console.log(resetRecord);
     if (!resetRecord || resetRecord.expiresAt < Date.now())
       return res.status(400).json({ error: 'Invalid or expired token' });
 
