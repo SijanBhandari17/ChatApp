@@ -60,7 +60,7 @@ const Features = () => {
         <div className="grid grid-cols-4 grid-rows-2 gap-6">
           {features.map((item, index) => {
             return (
-              <Card>
+              <Card key={index}>
                 <CardHeader>
                   <item.icon />
                   <CardTitle className="text-lg font-light">{item.title}</CardTitle>
