@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { handleRegister } = require('../controllers/registerController');
-const signupValidator = require('../utils/signupValidator');
 const handleOTP = require('../controllers/otpController');
+const { signupValidator } = require('../utils/validator');
 
 const RegisterRouter = Router();
 RegisterRouter.post('/', signupValidator, handleRegister);

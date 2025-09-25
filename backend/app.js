@@ -9,6 +9,8 @@ const RefreshRouter = require('./routes/refreshroute');
 const HomeRouter = require('./routes/homeRoutes');
 const cookieParser = require('cookie-parser');
 const LogoutRouter = require('./routes/logoutRoutes');
+const ForgotPasswordRouter = require('./routes/forgotPasswordRoutes');
+const ResetPasswordRouter = require('./routes/passwordResetRoutes');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -24,6 +26,8 @@ app.use('/login', LoginRouter);
 app.use('/refresh', RefreshRouter);
 app.use('/home', HomeRouter);
 app.use('/logout', LogoutRouter);
+app.use('/forgot-password', ForgotPasswordRouter);
+app.use('/reset-password', ResetPasswordRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello');

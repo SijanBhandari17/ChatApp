@@ -3,15 +3,18 @@ const bcrypt = require('bcrypt');
 const generateJWT = require('../utils/generateJWT');
 
 const handleLogin = async (req, res) => {
-  const { userName, email, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email, userName });
-    if (!user) return res.status(404).json({ error: 'Email or Username is not registered' });
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'Email or Username is not registered' });
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) return res.status(400).json({ error: 'Incorrect Password' });
 
-    const { accessToken, refreshToken } = generateJWT({ email, userName });
+    const { accessToken, refreshToken } = generateJWT({
+      email: user.email,
+      userName: user.userName,
+    });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,

@@ -1,7 +1,7 @@
 const PendingUser = require('../models/pendingUserModel');
 const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
-const sendOTP = require('./mailController');
+const { sendOTP } = require('./mailController');
 const { validationResult, matchedData } = require('express-validator');
 
 const handleRegister = async (req, res) => {
