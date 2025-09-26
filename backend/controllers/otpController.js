@@ -22,6 +22,7 @@ const handleOTP = async (req, res) => {
     const { accessToken, refreshToken } = generateJWT({
       userName: pendingUser.userName,
       email: pendingUser.email,
+      id: pendingUser._id,
     });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,

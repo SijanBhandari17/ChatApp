@@ -1,19 +1,26 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const generateJWT = require('../utils/generateJWT');
+const { validationResult, matchedData } = require('express-validator');
 
 const handleLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
+  const { email, password } = matchedData(req);
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Email or Username is not registered' });
+    if (!user) return res.status(400).json({ error: { msg: 'Incorrect Email or Password' } });
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) return res.status(400).json({ error: 'Incorrect Password' });
+    if (!passwordMatch)
+      return res.status(400).json({ error: { msg: 'Incorrect Email or Password' } });
 
     const { accessToken, refreshToken } = generateJWT({
       email: user.email,
       userName: user.userName,
+      id: user._id,
     });
 
     res.cookie('refreshToken', refreshToken, {

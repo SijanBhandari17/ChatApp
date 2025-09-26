@@ -18,6 +18,12 @@ const signupValidator = [
     .withMessage('Password must be strong (8+ chars, 1 number, 1 symbol)'),
 ];
 
+const reqValidator = [
+  body('email').notEmpty().withMessage('Email is required'),
+
+  body('password').notEmpty().withMessage('Password is required'),
+];
+
 const passwordValidator = [
   body('password')
     .isStrongPassword({
@@ -29,4 +35,4 @@ const passwordValidator = [
     .withMessage('Password must be strong (8+ chars, 1 number, 1 symbol)'),
 ];
 
-module.exports = { signupValidator, passwordValidator };
+module.exports = { signupValidator, reqValidator, passwordValidator };
