@@ -42,6 +42,7 @@ const SignInForm = () => {
   });
 
   const onSubmit = async data => {
+    setServerError('');
     try {
       await login({ email: data.email, password: data.password });
     } catch (err) {

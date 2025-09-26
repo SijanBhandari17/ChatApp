@@ -12,10 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 const ResetPasswordForm = () => {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { resetPassword } = useAuth();
@@ -38,22 +35,21 @@ const ResetPasswordForm = () => {
       path: ['confirmPassword'],
     });
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setError('');
-    setSending(true);
-    if (password !== confirmPassword) {
-      setError("Password don't match");
-      setSending(false);
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(resetPasswordSchema),
+  });
+
+  const onChangePassword = async data => {
+    setServerError('');
     try {
-      const response = await resetPassword({ password: confirmPassword, token, id });
-      setSending(false);
+      const response = await resetPassword({ password: data.confirmPassword, token, id });
     } catch (err) {
       const errorData = err.response.data.error[0].msg || err.response.data.error;
-      setError(errorData);
-      setSending(false);
+      setServerError(errorData);
     }
   };
 
@@ -66,8 +62,7 @@ const ResetPasswordForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" onSubmit={e => handleSubmit(e)}>
-          {error && <p className="mt-1 text-center text-sm text-red-600">{error}</p>}
+        <form className="space-y-4" onSubmit={handleSubmit(onChangePassword)}>
           <div className="space-y-2">
             <Label htmlFor="email">New Password</Label>
             <div className="relative">
@@ -76,12 +71,12 @@ const ResetPasswordForm = () => {
                 id="password"
                 placeholder="Enter new password"
                 className={
-                  error
+                  errors.password || serverError
                     ? cn('bg-muted-foreground/10 border-red-500 pl-10')
                     : cn('bg-muted-foreground/10 pl-10')
                 }
                 type={showPassword ? 'text' : 'password'}
-                onChange={e => setPassword(e.target.value)}
+                {...register('password')}
                 required
               />
               <button
@@ -91,24 +86,24 @@ const ResetPasswordForm = () => {
               >
                 {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
               </button>
+              {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
             <div className="relative">
               <Lock className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
               <Input
-                id="password"
+                id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Enter new password"
+                placeholder="Confirm new password"
                 className={
-                  error
+                  errors.confirmPassword || serverError
                     ? cn('bg-muted-foreground/10 border-red-500 pl-10')
                     : cn('bg-muted-foreground/10 pl-10')
                 }
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
+                {...register('confirmPassword')}
                 required
               />
               <button
@@ -119,14 +114,13 @@ const ResetPasswordForm = () => {
                 {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
               </button>
             </div>
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+            )}
           </div>
-
-          <Button
-            className="w-full"
-            disabled={password == '' || confirmPassword == '' || password != confirmPassword}
-            size="lg"
-          >
-            {sending ? 'Changing...' : 'Change Password'}
+          {serverError && <p className="mt-1 text-center text-sm text-red-600">{serverError}</p>}
+          <Button className="w-full" disabled={isSubmitting} size="lg">
+            {isSubmitting ? 'Changing...' : 'Change Password'}
           </Button>
         </form>
       </CardContent>

@@ -20,7 +20,10 @@ const handlePasswordReset = async (req, res) => {
     }
     const sameAsOldPassword = await bcrypt.compare(password, user.password);
 
-    if (sameAsOldPassword) return res.status(400).json({ error: 'Same as old Password' });
+    if (sameAsOldPassword)
+      return res
+        .status(400)
+        .json({ error: 'New password must be different from current password' });
 
     if (!resetRecord || resetRecord.expiresAt < Date.now())
       return res.status(400).json({ error: 'Invalid or expired token' });
