@@ -25,9 +25,11 @@ const handlePasswordForgot = async (req, res) => {
       expiresAt: Date.now() + 60 * 60 * 1000,
     });
 
-    const link = `http://localhost/reset-password?token=${token}&id=${user._id}`;
+    const link = `http://localhost:5173/auth/resetpassword?token=${token}&id=${user._id}`;
+    console.log(link);
 
-    await sendResetLink(user.email, link);
+    const mailResult = await sendResetLink(user.email, link);
+    console.log(mailResult);
 
     return res
       .status(200)

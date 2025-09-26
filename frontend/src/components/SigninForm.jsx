@@ -24,7 +24,6 @@ const SignInForm = () => {
     const data = { email, password };
     try {
       const response = await login(data);
-      console.log('Login successful:', response.data);
     } catch (err) {
       const errorData = err.response?.data.error;
       if (errorData?.msg) {
@@ -98,7 +97,7 @@ const SignInForm = () => {
                 <Checkbox id="terms" />
                 <Label htmlFor="terms">Remember me</Label>
               </div>
-              <Link to="/auth/resetpassword">
+              <Link to="/auth/forgotpassword">
                 <Button variant="link">Forgot Password?</Button>
               </Link>
             </div>

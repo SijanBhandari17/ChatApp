@@ -5,6 +5,7 @@ import RouterErrorElement from './ErrorComponent';
 import OTPForm from '@/components/OTPForm';
 import ForgotPasswordForm from '@/components/ForgotPasswordForm';
 import AuthForm from '@/components/AuthForm';
+import ResetPasswordForm from '@/components/ResetPasswordForm';
 
 const router = createBrowserRouter([
   {
@@ -18,7 +19,8 @@ const router = createBrowserRouter([
     children: [
       { path: ':tab', element: <AuthForm /> },
       { path: 'otp', element: <OTPForm /> },
-      { path: 'resetpassword', element: <ForgotPasswordForm /> },
+      { path: 'forgotpassword', element: <ForgotPasswordForm /> },
+      { path: 'resetpassword', element: <ResetPasswordForm /> },
     ],
     errorElement: <RouterErrorElement />,
   },

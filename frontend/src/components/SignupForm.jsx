@@ -59,7 +59,7 @@ const SignupForm = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="text-muted-foreground hover:text-foreground absolute top-3 right-3"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
             </button>
           </div>
         </div>
@@ -79,7 +79,7 @@ const SignupForm = () => {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="text-muted-foreground hover:text-foreground absolute top-3 right-3"
             >
-              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
             </button>
           </div>
         </div>

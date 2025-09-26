@@ -4,11 +4,28 @@ import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuth from '@/stores/authStore';
 
 const ForgotPasswordForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [sending, setIsSending] = useState(false);
   const [email, setEmail] = useState('');
+  const { forgotPassword } = useAuth();
+  const navigate = useNavigate();
+
+  const handleResetLink = async e => {
+    e.preventDefault();
+    setIsSending(true);
+    try {
+      const response = await forgotPassword({ email });
+      console.log(response);
+      setIsSubmitted(true);
+    } catch (err) {
+      const errorData = err.response?.data.message;
+      console.log(err);
+    }
+  };
 
   if (isSubmitted) {
     return (
@@ -56,13 +73,7 @@ const ForgotPasswordForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form
-          className="space-y-4"
-          onSubmit={e => {
-            e.preventDefault();
-            setIsSubmitted(true);
-          }}
-        >
+        <form className="space-y-4" onSubmit={e => handleResetLink(e)}>
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
             <div className="relative">
@@ -80,7 +91,7 @@ const ForgotPasswordForm = () => {
           </div>
 
           <Button className="w-full" size="lg">
-            {'Send Reset Link'}
+            {sending ? 'Sending...' : 'Send Reset Link'}
           </Button>
         </form>
 

@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useNavigate, useParams } from 'react-router-dom';
 import SignInForm from './SigninForm';
-import SignupForm from './SingupForm';
+import SignupForm from './SignupForm';
 
 const AuthForm = () => {
   const { tab } = useParams();
