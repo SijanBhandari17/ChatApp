@@ -37,7 +37,6 @@ const SignInForm = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
@@ -74,6 +73,7 @@ const SignInForm = () => {
                 <Input
                   type="email"
                   id="email"
+                  required
                   placeholder="Email"
                   {...register('email')}
                   className={
@@ -93,6 +93,7 @@ const SignInForm = () => {
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
+                  required
                   className={
                     errors.password || serverError
                       ? cn('bg-muted-foreground/10 border-red-500 pl-10')
