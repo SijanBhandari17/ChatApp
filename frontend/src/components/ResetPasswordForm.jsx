@@ -7,6 +7,9 @@ import { Button } from './ui/button';
 import useAuth from '@/stores/authStore';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
 const ResetPasswordForm = () => {
   const [password, setPassword] = useState('');
@@ -19,6 +22,21 @@ const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const id = searchParams.get('id');
+
+  const resetPasswordSchema = z
+    .object({
+      password: z
+        .string()
+        .min(8, 'Password must be at least 8 characters long')
+        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+        .regex(/[0-9]/, 'Password must contain at least one number')
+        .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one symbol'),
+      confirmPassword: z.string(),
+    })
+    .refine(data => data.password === data.confirmPassword, {
+      message: 'Passwords do not match',
+      path: ['confirmPassword'],
+    });
 
   const handleSubmit = async e => {
     e.preventDefault();

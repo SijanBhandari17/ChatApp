@@ -5,10 +5,42 @@ import { Input } from './ui/input';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
 const SignupForm = () => {
+  const signupFormSchema = z
+    .object({
+      email: z.string().trim().normalize().email({ message: 'Invalid email address' }),
+      password: z
+        .string()
+        .min(8, 'Password must be at least 8 characters long')
+        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+        .regex(/[0-9]/, 'Password must contain at least one number')
+        .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one symbol'),
+      confirmPassword: z.string(),
+    })
+    .refine(data => data.password === data.confirmPassword, {
+      message: 'Passwords do not match',
+      path: ['confirmPassword'],
+    });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(signupFormSchema) });
+
+  // const onSubmit = async (data) => {
+  //   try{
+  //     await
+  //   }
+  // }
+
   return (
     <Card>
       <CardHeader className="space-y-1">

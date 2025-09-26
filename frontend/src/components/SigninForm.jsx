@@ -8,26 +8,48 @@ import { Input } from './ui/input';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from './ui/card';
 import useAuth from '@/stores/authStore';
 import { cn } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [signinDisabled, setSigninDisabled] = useState(true);
+  const [serverError, setServerError] = useState('');
   const { login } = useAuth();
 
-  const handleSigninFormSubmit = async e => {
-    e.preventDefault();
-    setError('');
+  const loginSchema = z.object({
+    email: z.string().trim().email({ message: 'Invalid email address' }),
+    password: z
+      .string()
+      .min(8, 'Your password must be at least 8 characters (as required during registration)')
+      .regex(
+        /[A-Z]/,
+        'Your password must include at least one uppercase letter (per registration rules)',
+      )
+      .regex(/[0-9]/, 'Your password must include at least one number (per registration rules)')
+      .regex(
+        /[^a-zA-Z0-9]/,
+        'Your password must include at least one symbol (per registration rules)',
+      ),
+  });
 
-    const data = { email, password };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async data => {
     try {
-      const response = await login(data);
+      await login({ email: data.email, password: data.password });
     } catch (err) {
       const errorData = err.response?.data.error;
       if (errorData?.msg) {
-        setError('Incorrect email or password');
+        console.log(err);
+        setServerError(errorData?.msg);
       } else {
         console.error('Unexpected error:', err);
       }
@@ -43,10 +65,9 @@ const SignInForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={e => handleSigninFormSubmit(e)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2">
             <div className="space-y-2">
-              {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
@@ -54,15 +75,14 @@ const SignInForm = () => {
                   type="email"
                   id="email"
                   placeholder="Email"
-                  value={email}
-                  name="email"
-                  onChange={e => setEmail(e.target.value)}
+                  {...register('email')}
                   className={
-                    error
+                    errors.email || serverError
                       ? cn('bg-muted-foreground/10 border-red-500 pl-10')
                       : cn('bg-muted-foreground/10 pl-10')
                   }
-                />
+                />{' '}
+                {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
               </div>
             </div>
 
@@ -73,15 +93,13 @@ const SignInForm = () => {
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  value={password}
                   className={
-                    error
+                    errors.password || serverError
                       ? cn('bg-muted-foreground/10 border-red-500 pl-10')
                       : cn('bg-muted-foreground/10 pl-10')
                   }
-                  name="password"
-                  onChange={e => setPassword(e.target.value)}
                   placeholder="Password"
+                  {...register('password')}
                 />
                 <button
                   type="button"
@@ -90,8 +108,12 @@ const SignInForm = () => {
                 >
                   {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
+                {errors.password && (
+                  <p className="text-sm text-red-600">{errors.password.message}</p>
+                )}
               </div>
             </div>
+            {serverError && <p className="mt-1 text-sm text-red-600">{serverError}</p>}
             <div className="flex items-center justify-between">
               <div className="flex gap-2">
                 <Checkbox id="terms" />
@@ -102,7 +124,7 @@ const SignInForm = () => {
               </Link>
             </div>
           </div>
-          <Button className="w-full" size="lg" disabled={email == '' || password == ''}>
+          <Button className="w-full" size="lg" disabled={isSubmitting}>
             Sign In
           </Button>
         </form>
