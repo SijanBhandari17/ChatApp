@@ -10,14 +10,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { cn } from '@/lib/utils';
+import { emailCheckSchema } from '@/lib/validator';
 
 const ForgotPasswordForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { forgotPassword } = useAuth();
-
-  const emailCheckSchema = z.object({
-    email: z.string().email({ message: 'Invalid email message' }),
-  });
 
   const {
     register,

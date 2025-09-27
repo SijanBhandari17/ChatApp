@@ -2,8 +2,8 @@ const { body } = require('express-validator');
 
 const userNameValidator = body('userName')
   .trim()
-  .isLength({ min: 3 })
-  .withMessage('Username must be at least 3 characters long');
+  .isLength({ min: 5 })
+  .withMessage('Username must be at least 5 characters long');
 
 const emailValidator = body('email').normalizeEmail().isEmail().withMessage('Enter a valid email');
 

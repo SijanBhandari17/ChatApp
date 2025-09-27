@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
 const { sendOTP } = require('./mailController');
 const { validationResult, matchedData } = require('express-validator');
+const User = require('../models/userModel');
 
 const handleRegister = async (req, res) => {
   const errors = validationResult(req);
@@ -13,9 +14,12 @@ const handleRegister = async (req, res) => {
 
   const cleanData = matchedData(req);
 
-  const { email, password } = cleanData;
+  const { userName, email, password } = cleanData;
 
-  const alreadyRegistered = await PendingUser.findOne({ email: email });
+  const alreadyAUser = await User.findOne({ email });
+  if (alreadyAUser) return res.status(409).json({ error: 'User with this email already exists' });
+
+  const alreadyRegistered = await PendingUser.findOne({ email, userName });
 
   if (alreadyRegistered) {
     const passwordMatch = await bcrypt.compare(password, alreadyRegistered.password);
@@ -58,13 +62,19 @@ const handleValidRegisteration = async ({ userName, email, password }, res, upda
         otp_expiry: otpExpiry,
       });
     }
-    const { password: _, ...responseObject } = result.toObject();
+    const { password: _, otp: _otp, otp_expiry, ...responseObject } = result.toObject();
     console.log('Otp send vayo');
     return res
       .status(200)
       .json({ message: 'An Otp has been sent to your email', body: responseObject });
   } catch (err) {
-    return res.status(500).json({ error: `An error encountered ${err}` });
+    if (err.code === 11000) {
+      return res.status(409).json({
+        error: 'This email is already taken',
+        field: Object.keys(err.keyPattern)[0],
+      });
+    }
+    return res.status(500).json({ error: 'Server error. Please try again.' });
   }
 };
 

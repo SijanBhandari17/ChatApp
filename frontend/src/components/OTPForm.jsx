@@ -4,15 +4,39 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from './ui/input-otp';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import useAuth from '@/stores/authStore';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const OTPForm = () => {
   const [otp, setOtp] = useState('');
   const [resend, setResend] = useState(false);
   const [verifyDisabled, setVerifyDisabled] = useState(true);
+  const [error, setError] = useState('');
+  const { user, setUser } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email ?? '';
+  console.log(email);
 
-  const handleResend = () => {};
+  useEffect(() => {
+    if (!email) {
+      navigate('/auth/signup', { replace: true });
+    }
+  }, [email, navigate]);
+
+  const handleOTPSubmit = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/register/otp', {
+        otp,
+        email,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Card>
@@ -41,7 +65,7 @@ const OTPForm = () => {
           </div>
         </div>
         <div className="flex items-center justify-center">
-          <Button size="lg" className="w-full" disabled={otp.length != 6}>
+          <Button size="lg" onClick={handleOTPSubmit} className="w-full" disabled={otp.length != 6}>
             Verify Code
           </Button>
         </div>

@@ -10,28 +10,12 @@ import useAuth from '@/stores/authStore';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { loginSchema } from '@/lib/validator';
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
-  const { login } = useAuth();
-
-  const loginSchema = z.object({
-    email: z.string().trim().email({ message: 'Invalid email address' }),
-    password: z
-      .string()
-      .min(8, 'Your password must be at least 8 characters (as required during registration)')
-      .regex(
-        /[A-Z]/,
-        'Your password must include at least one uppercase letter (per registration rules)',
-      )
-      .regex(/[0-9]/, 'Your password must include at least one number (per registration rules)')
-      .regex(
-        /[^a-zA-Z0-9]/,
-        'Your password must include at least one symbol (per registration rules)',
-      ),
-  });
+  const { login, setUser } = useAuth();
 
   const {
     register,
@@ -44,7 +28,8 @@ const SignInForm = () => {
   const onSubmit = async data => {
     setServerError('');
     try {
-      await login({ email: data.email, password: data.password });
+      const response = await login({ email: data.email, password: data.password });
+      setUser(response.body);
     } catch (err) {
       const errorData = err.response?.data.error;
       if (errorData?.msg) {
