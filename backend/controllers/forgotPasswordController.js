@@ -16,7 +16,6 @@ const handlePasswordForgot = async (req, res) => {
 
     const token = crypto.randomBytes(32).toString('hex');
     const hash = await bcrypt.hash(token, 10);
-
     await forgotPassword.deleteMany({ userId: user._id });
 
     const result = await forgotPassword.create({

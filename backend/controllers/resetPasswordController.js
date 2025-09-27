@@ -33,6 +33,7 @@ const handlePasswordReset = async (req, res) => {
     if (!resetRecord.token) {
       return res.status(400).json({ error: 'Token not found' });
     }
+
     const isValid = await bcrypt.compare(token, resetRecord.token);
     if (!isValid) return res.status(400).json({ error: 'Invalid token' });
 

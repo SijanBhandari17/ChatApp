@@ -31,7 +31,6 @@ const SignupForm = () => {
         email: data.email,
         password: data.confirmPassword,
       });
-
       navigate('/auth/otp', { state: { email: data.email } });
     } catch (err) {
       if (err.response.status == 409) {

@@ -51,15 +51,6 @@ const ForgotPasswordForm = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-4 text-center">
-            <p className="text-muted-foreground text-sm">
-              Didn't receive the email? Check your spam folder or try again.
-            </p>
-            <Button variant="outline" className="w-full">
-              Send Another Email
-            </Button>
-          </div>
-
           <div className="flex items-center justify-center">
             <Link to="/auth/signin">
               <Button variant="link" className="text-sm">

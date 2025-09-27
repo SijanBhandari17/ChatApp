@@ -17,6 +17,7 @@ const handleRegister = async (req, res) => {
   const { userName, email, password } = cleanData;
 
   const alreadyAUser = await User.findOne({ email });
+
   if (alreadyAUser) return res.status(409).json({ error: 'User with this email already exists' });
 
   const alreadyRegistered = await PendingUser.findOne({ email, userName });
