@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { cn } from '@/lib/utils';
 import { emailCheckSchema } from '@/lib/validator';
+import axios from 'axios';
 
 const ForgotPasswordForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -24,6 +25,19 @@ const ForgotPasswordForm = () => {
   } = useForm({
     resolver: zodResolver(emailCheckSchema),
   });
+
+  const handleResendResetLink = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/forgot-password/resend', {
+        email: getValues('email'),
+      });
+      console.log(response);
+      setIsSubmitted(true);
+    } catch (err) {
+      const errorData = err.response?.data.message;
+      console.log(err);
+    }
+  };
 
   const handleResetLink = async data => {
     try {
@@ -51,6 +65,15 @@ const ForgotPasswordForm = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-4 text-center">
+            <p className="text-muted-foreground text-sm">
+              Didn't receive the email? Check your spam folder or try again.
+            </p>
+            <Button variant="outline" onClick={handleResendResetLink} className="w-full">
+              Send Another Email
+            </Button>
+          </div>
+
           <div className="flex items-center justify-center">
             <Link to="/auth/signin">
               <Button variant="link" className="text-sm">

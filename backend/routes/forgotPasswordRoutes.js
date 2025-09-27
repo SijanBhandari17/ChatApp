@@ -1,7 +1,12 @@
 const { Router } = require('express');
-const { handlePasswordForgot } = require('../controllers/forgotPasswordController');
+const {
+  handlePasswordForgot,
+  handlePasswordForgotResend,
+} = require('../controllers/forgotPasswordController');
+const { resetLimiter } = require('../middleware/rateLimiter');
 const ForgotPasswordRouter = Router();
 
-ForgotPasswordRouter.post('/', handlePasswordForgot);
+ForgotPasswordRouter.post('/', resetLimiter, handlePasswordForgot);
+ForgotPasswordRouter.post('/resend', resetLimiter, handlePasswordForgotResend);
 
 module.exports = ForgotPasswordRouter;
