@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@/lib/validator';
+import { saveToLocalStroage } from '@/lib/saveToLocalStorage';
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +31,7 @@ const SignInForm = () => {
     try {
       const response = await login({ email: data.email, password: data.password });
       setUser(response.body);
+      saveToLocalStroage('accessToken', response.data.accessToken);
     } catch (err) {
       const errorData = err.response?.data.error;
       if (errorData?.msg) {

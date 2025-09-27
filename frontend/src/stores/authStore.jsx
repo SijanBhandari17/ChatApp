@@ -6,7 +6,7 @@ const useAuthStore = create(set => ({
 
   setUser: user => set({ user }),
   login: async userData => {
-    return await axios.post('http://localhost:3000/login', userData);
+    return await axios.post('http://localhost:3000/login', userData, { withCredentials: true });
   },
 
   forgotPassword: async userData => {

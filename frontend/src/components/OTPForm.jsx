@@ -3,16 +3,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { InputOTP, InputOTPGroup, InputOTPSlot } from './ui/input-otp';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import useAuth from '@/stores/authStore';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { saveToLocalStroage } from '@/lib/saveToLocalStorage';
 
 const OTPForm = () => {
   const [otp, setOtp] = useState('');
-  const [resend, setResend] = useState(false);
   const [verifyDisabled, setVerifyDisabled] = useState(false);
   const [error, setError] = useState('');
   const { user, setUser } = useAuth();
@@ -30,16 +30,27 @@ const OTPForm = () => {
     setVerifyDisabled(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:3000/register/otp', {
-        otp,
-        email,
-      });
-      setVerifyDisabled(false);
+      const response = await axios.post(
+        'http://localhost:3000/register/otp',
+        {
+          otp,
+          email,
+        },
+        { withCredentials: true },
+      );
+      setUser(response.data.body);
+      saveToLocalStroage('accessToken', response.data.accessToken);
     } catch (err) {
-      if (err.response.data?.error) setError(err.response.data?.error);
-      console.log(err);
-      setVerifyDisabled(false);
+      if (err.response) {
+        console.error('Server Error:', err.response.data.error);
+        setError(err.response.data?.error);
+      } else if (err.request) {
+        console.error('No response from server. Possible network issue.');
+      } else {
+        console.error('Error:', err.message);
+      }
     }
+    setVerifyDisabled(false);
   };
 
   return (
@@ -70,7 +81,12 @@ const OTPForm = () => {
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
         <div className="flex items-center justify-center">
-          <Button size="lg" onClick={handleOTPSubmit} className="w-full" disabled={otp.length != 6}>
+          <Button
+            size="lg"
+            onClick={handleOTPSubmit}
+            className="w-full"
+            disabled={otp.length != 6 || verifyDisabled}
+          >
             Verify Code
           </Button>
         </div>

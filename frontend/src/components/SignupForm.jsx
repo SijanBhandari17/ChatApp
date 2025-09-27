@@ -144,7 +144,7 @@ const SignupForm = () => {
           </div>
 
           <Button className="w-full" size="lg" disabled={isSubmitting}>
-            Create Account
+            {isSubmitting ? 'Creating...' : 'Create Account'}
           </Button>
         </form>
       </CardContent>
