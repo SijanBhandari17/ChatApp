@@ -2,10 +2,10 @@ const whiteListArr = ['http://localhost:5173'];
 
 const options = {
   origin: (requestOrigin, callback) => {
-    if (whiteListArr.includes(requestOrigin)) {
+    if (!requestOrigin || whiteListArr.includes(requestOrigin)) {
       callback(null, true);
     } else {
-      callback(err, false);
+      callback(new Error('Not allowed by CORS'), false);
     }
   },
   credentials: true,
