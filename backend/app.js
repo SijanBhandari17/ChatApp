@@ -13,6 +13,8 @@ const LogoutRouter = require('./routes/logoutRoutes');
 const ForgotPasswordRouter = require('./routes/forgotPasswordRoutes');
 const ResetPasswordRouter = require('./routes/passwordResetRoutes');
 const options = require('./config/cors');
+const SearchRouter = require('./routes/searchRoutes');
+const createRandomUsers = require('./utils/createUsers');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -31,6 +33,7 @@ app.use('/home', HomeRouter);
 app.use('/logout', LogoutRouter);
 app.use('/forgot-password', ForgotPasswordRouter);
 app.use('/reset-password', ResetPasswordRouter);
+app.use('/search', SearchRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello');
