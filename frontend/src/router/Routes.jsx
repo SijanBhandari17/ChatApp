@@ -6,8 +6,14 @@ import OTPForm from '@/components/OTPForm';
 import ForgotPasswordForm from '@/components/ForgotPasswordForm';
 import AuthForm from '@/components/AuthForm';
 import ResetPasswordForm from '@/components/ResetPasswordForm';
+import DashBoard from '@/pages/DashboardPage';
 
 const router = createBrowserRouter([
+  {
+    path: '/dashboard',
+    element: <DashBoard />,
+    errorElement: <RouterErrorElement />,
+  },
   {
     path: '/',
     element: <LandingPage />,

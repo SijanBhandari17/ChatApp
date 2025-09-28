@@ -32,6 +32,7 @@ const signupFormSchema = z
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
+
 const emailCheckSchema = z.object({
   email: z.string().email({ message: 'Invalid email message' }),
 });
