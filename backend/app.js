@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
 const connectDb = require('./config/database');
 const { default: mongoose } = require('mongoose');
 const RegisterRouter = require('./routes/registerRoutes');
@@ -11,12 +12,14 @@ const cookieParser = require('cookie-parser');
 const LogoutRouter = require('./routes/logoutRoutes');
 const ForgotPasswordRouter = require('./routes/forgotPasswordRoutes');
 const ResetPasswordRouter = require('./routes/passwordResetRoutes');
+const options = require('./config/cors');
 
 const app = express();
 const PORT = process.env.PORT;
 
 connectDb();
 
+app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());

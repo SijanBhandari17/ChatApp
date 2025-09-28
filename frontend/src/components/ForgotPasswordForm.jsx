@@ -5,10 +5,50 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Link } from 'react-router-dom';
+import useAuth from '@/stores/authStore';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { cn } from '@/lib/utils';
+import { emailCheckSchema } from '@/lib/validator';
+import axios from 'axios';
 
 const ForgotPasswordForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [email, setEmail] = useState('');
+  const { forgotPassword } = useAuth();
+
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(emailCheckSchema),
+  });
+
+  const handleResendResetLink = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/forgot-password/resend', {
+        email: getValues('email'),
+      });
+      console.log(response);
+      setIsSubmitted(true);
+    } catch (err) {
+      const errorData = err.response?.data.message;
+      console.log(err);
+    }
+  };
+
+  const handleResetLink = async data => {
+    try {
+      const response = await forgotPassword({ email: data.email });
+      console.log(response);
+      setIsSubmitted(true);
+    } catch (err) {
+      const errorData = err.response?.data.message;
+      console.log(err);
+    }
+  };
 
   if (isSubmitted) {
     return (
@@ -21,7 +61,7 @@ const ForgotPasswordForm = () => {
           </div>
           <CardTitle className="text-center text-2xl">Email sent!</CardTitle>
           <CardDescription className="text-center">
-            If the email exits in our system , an email is send to <strong>{email}</strong>
+            If the email exits in our system , an email is sent to {getValues('email')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -29,7 +69,7 @@ const ForgotPasswordForm = () => {
             <p className="text-muted-foreground text-sm">
               Didn't receive the email? Check your spam folder or try again.
             </p>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" onClick={handleResendResetLink} className="w-full">
               Send Another Email
             </Button>
           </div>
@@ -56,13 +96,7 @@ const ForgotPasswordForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form
-          className="space-y-4"
-          onSubmit={e => {
-            e.preventDefault();
-            setIsSubmitted(true);
-          }}
-        >
+        <form className="space-y-4" onSubmit={handleSubmit(handleResetLink)}>
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
             <div className="relative">
@@ -71,16 +105,20 @@ const ForgotPasswordForm = () => {
                 id="email"
                 type="email"
                 placeholder="Enter your email address"
-                className="pl-10"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                className={
+                  errors.password
+                    ? cn('bg-muted-foreground/10 border-red-500 pl-10')
+                    : cn('bg-muted-foreground/10 pl-10')
+                }
+                {...register('email')}
                 required
               />
+              {errors.password && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
           </div>
 
-          <Button className="w-full" size="lg">
-            {'Send Reset Link'}
+          <Button className="w-full" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? 'Sending...' : 'Send Reset Link'}
           </Button>
         </form>
 

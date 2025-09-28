@@ -3,16 +3,55 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { InputOTP, InputOTPGroup, InputOTPSlot } from './ui/input-otp';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import useAuth from '@/stores/authStore';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { saveToLocalStroage } from '@/lib/saveToLocalStorage';
 
 const OTPForm = () => {
   const [otp, setOtp] = useState('');
-  const [resend, setResend] = useState(false);
-  const [verifyDisabled, setVerifyDisabled] = useState(true);
+  const [verifyDisabled, setVerifyDisabled] = useState(false);
+  const [error, setError] = useState('');
+  const { user, setUser } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email ?? '';
 
-  const handleResend = () => {};
+  useEffect(() => {
+    if (!email) {
+      navigate('/auth/signup', { replace: true });
+    }
+  }, [email, navigate]);
+
+  const handleOTPSubmit = async () => {
+    setVerifyDisabled(true);
+    setError('');
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/register/otp',
+        {
+          otp,
+          email,
+        },
+        { withCredentials: true },
+      );
+      setUser(response.data.body);
+      saveToLocalStroage('accessToken', response.data.accessToken);
+    } catch (err) {
+      if (err.response) {
+        console.error('Server Error:', err.response.data.error);
+        setError(err.response.data?.error);
+      } else if (err.request) {
+        console.error('No response from server. Possible network issue.');
+      } else {
+        console.error('Error:', err.message);
+      }
+    }
+    setVerifyDisabled(false);
+  };
 
   return (
     <Card>
@@ -39,20 +78,17 @@ const OTPForm = () => {
               </InputOTPGroup>
             </InputOTP>
           </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
         <div className="flex items-center justify-center">
-          <Button size="lg" className="w-full" disabled={otp.length != 6}>
+          <Button
+            size="lg"
+            onClick={handleOTPSubmit}
+            className="w-full"
+            disabled={otp.length != 6 || verifyDisabled}
+          >
             Verify Code
           </Button>
-        </div>
-        <div className="flex flex-col items-center justify-center space-y-2">
-          <p className="text-muted-foreground">Didn't receive the code?</p>
-          <div className="w-full">
-            <Button className="w-full" variant="outline">
-              <RotateCcw className="h-4 w-4" />
-              Resend Code
-            </Button>
-          </div>
         </div>
         <div className="flex items-center justify-center">
           <Link to="/auth/signin">

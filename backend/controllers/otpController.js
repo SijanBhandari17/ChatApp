@@ -5,6 +5,7 @@ const generateJWT = require('../utils/generateJWT');
 
 const handleOTP = async (req, res) => {
   const { email, otp } = req.body;
+
   try {
     const pendingUser = await PendingUser.findOne({ email });
     if (!pendingUser) return res.status(400).json({ error: 'Otp is invalid' });
@@ -18,11 +19,15 @@ const handleOTP = async (req, res) => {
     const { otp: _otp, otp_expiry, _id, ...userData } = pendingUser.toObject();
 
     const user = await User.create(userData);
+    const { password, ...responseObject } = userData;
+
     await PendingUser.deleteOne({ _id: pendingUser._id });
     const { accessToken, refreshToken } = generateJWT({
       userName: pendingUser.userName,
       email: pendingUser.email,
+      id: pendingUser._id,
     });
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: false,
@@ -33,9 +38,11 @@ const handleOTP = async (req, res) => {
     user.refresh_token = refreshToken;
     await user.save();
 
-    return res
-      .status(201)
-      .json({ message: 'User created successfully and logged in', body: userData, accessToken });
+    return res.status(201).json({
+      message: 'User created successfully and logged in',
+      body: responseObject,
+      accessToken,
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
