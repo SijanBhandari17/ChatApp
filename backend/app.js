@@ -17,6 +17,7 @@ import ResetPasswordRouter from './routes/passwordResetRoutes.js';
 import SearchRouter from './routes/searchRoutes.js';
 import conversationRouter from './routes/createConversationRouter.js';
 import messageRouter from './routes/messagesRouter.js';
+import { initializeRedisClient } from './config/redis.js';
 
 const app = express();
 
@@ -46,10 +47,15 @@ app.use((err, req, res, next) => {
   console.error(err);
 });
 
-connectDb()
-  .then(() => {
+async function startServer() {
+  try {
+    await connectDb();
+    await initializeRedisClient();
     app.listen(process.env.PORT || 3000, () =>
       console.log(`Server running on port ${process.env.PORT || 3000}`),
     );
-  })
-  .catch(err => console.error('DB connection failed:', err));
+  } catch (err) {
+    console.error('Startup failed:', err);
+  }
+}
+startServer();

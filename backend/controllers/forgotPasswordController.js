@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
-import forgotPassword from '../models/forgotPasswordModel.js';
+import ForgotPassword from '../models/forgotPasswordModel.js';
 import User from '../models/userModel.js';
 import { sendResetLink } from './mailController.js';
 
@@ -8,9 +8,9 @@ const createAndSendResetLink = async user => {
   const token = crypto.randomBytes(32).toString('hex');
   const hash = await bcrypt.hash(token, 10);
 
-  await forgotPassword.deleteMany({ userId: user._id });
+  await ForgotPassword.deleteMany({ userId: user._id });
 
-  await forgotPassword.create({
+  await ForgotPassword.create({
     userId: user._id,
     token: hash,
     expiresAt: Date.now() + 60 * 60 * 1000,
@@ -43,7 +43,7 @@ const handlePasswordForgotResend = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      const record = await forgotPassword.findOne({ userId: user._id });
+      const record = await ForgotPassword.findOne({ userId: user._id });
       if (!record || record.expiresAt <= Date.now()) {
         await createAndSendResetLink(user);
       } else {

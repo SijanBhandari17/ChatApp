@@ -10,6 +10,7 @@ const createConversationSchema = new mongoose.Schema(
         role: { type: String, enum: ['member', 'admin'] },
       },
     ],
+    deleted_for: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true },
 );

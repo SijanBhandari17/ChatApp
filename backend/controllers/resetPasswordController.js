@@ -1,4 +1,4 @@
-import forgotPassword from '../models/forgotPasswordModel.js';
+import ForgotPassword from '../models/forgotPasswordModel.js';
 import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 import { validationResult, matchedData } from 'express-validator';
@@ -11,7 +11,7 @@ const handlePasswordReset = async (req, res) => {
   const { password, token, id } = matchedData(req);
 
   try {
-    const resetRecord = await forgotPassword.findOne({ userId: id });
+    const resetRecord = await ForgotPassword.findOne({ userId: id });
 
     const user = await User.findById(id);
 

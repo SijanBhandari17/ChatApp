@@ -1,9 +1,12 @@
+import { redisClient } from '../config/redis.js';
+import checkConversationCache from '../utils/checkConversationCache.js';
 import Conversation from '../models/conversationModel.js';
+import generateNumber from '../utils/contorPairing.js';
 
-const handleConversationCreation = async (req, res) => {
-  const { type, participants } = req.body;
+const getOrCreateDirectConversation = async (req, res, next) => {
+  const { conversation_type, participants } = req.body;
 
-  if (!type) {
+  if (!conversation_type) {
     return res.status(400).json({ error: 'Missing field: type' });
   }
 
@@ -11,8 +14,14 @@ const handleConversationCreation = async (req, res) => {
     return res.status(400).json({ error: 'Missing field: participants' });
   }
   try {
+    const existingId = await checkConversationCache(participants);
+    if (existingId) {
+      req.conversation_id = existingId;
+      console.log('conversation in cache:', existingId);
+      return next();
+    }
     const existingConversation = await Conversation.findOne({
-      conversation_type: type,
+      conversation_type,
       participants: {
         $all: [
           { $elemMatch: { user_id: participants[0] } },
@@ -21,20 +30,28 @@ const handleConversationCreation = async (req, res) => {
       },
     });
 
-    if (alreadyExisting)
-      return res
-        .status(200)
-        .json({ message: 'conversation already exists', body: existingConversation });
+    if (existingConversation) {
+      const key = `conversation:${generateNumber(participants)}`;
+      await redisClient.set(key, existingConversation._id.toString());
+      console.log('existing conversation :', existingConversation._id);
+      req.conversation_id = existingConversation._id.toString();
+      return next();
+    }
 
     const newConversation = await Conversation.create({
-      convesation_type: type,
+      conversation_type,
       participants: [{ user_id: participants[0] }, { user_id: participants[1] }],
     });
 
-    return res.status(201).json({ message: 'Coversation created', body: newConversation });
+    const key = `conversation:${generateNumber(participants)}`;
+    await redisClient.set(key, newConversation._id.toString());
+    console.log('conversation :', newConversation._id);
+
+    req.conversation_id = newConversation._id.toString();
+    return next();
   } catch (err) {
-    return res.status(500).json({ error: `An error occurred: ${err.message}` });
+    return res.status(500).json({ error: `An error occurred here: ${err.message}` });
   }
 };
 
-export default handleConversationCreation;
+export default getOrCreateDirectConversation;

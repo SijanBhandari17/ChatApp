@@ -1,7 +1,21 @@
 import { createClient } from 'redis';
 
-const client = createClient();
+let redisClient;
 
-client.on('error', err => console.log('Redis Client Error', err));
+async function initializeRedisClient() {
+  const redisURL = process.env.REDIS_URL;
+  if (!redisURL) return console.warn('No Redis URL found in env!');
 
-await client.connect();
+  redisClient = createClient({ url: redisURL });
+
+  redisClient.on('error', e => console.error('Redis error:', e));
+
+  try {
+    await redisClient.connect();
+    console.log('Connected to Redis successfully!');
+  } catch (e) {
+    console.error('Redis connection failed:', e);
+  }
+}
+
+export { redisClient, initializeRedisClient };
