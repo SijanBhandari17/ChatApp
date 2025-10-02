@@ -1,7 +1,8 @@
-const { Router } = require('express');
-const handleUserSeach = require('../controllers/searchController');
+import { Router } from 'express';
+import handleUserSeach from '../controllers/searchController.js';
 
 const SearchRouter = Router();
+
 SearchRouter.get('/users', handleUserSeach);
 
-module.exports = SearchRouter;
+export default SearchRouter;

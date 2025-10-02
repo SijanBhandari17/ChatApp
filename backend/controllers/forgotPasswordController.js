@@ -1,8 +1,8 @@
-const crypto = require('crypto');
-const bcrypt = require('bcrypt');
-const forgotPassword = require('../models/forgotPasswordModel');
-const User = require('../models/userModel');
-const { sendResetLink } = require('./mailController');
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
+import forgotPassword from '../models/forgotPasswordModel.js';
+import User from '../models/userModel.js';
+import { sendResetLink } from './mailController.js';
 
 const createAndSendResetLink = async user => {
   const token = crypto.randomBytes(32).toString('hex');
@@ -58,4 +58,4 @@ const handlePasswordForgotResend = async (req, res) => {
   }
 };
 
-module.exports = { handlePasswordForgot, handlePasswordForgotResend };
+export { handlePasswordForgot, handlePasswordForgotResend };

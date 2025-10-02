@@ -1,9 +1,9 @@
-const PendingUser = require('../models/pendingUserModel');
-const bcrypt = require('bcrypt');
-const otpGenerator = require('otp-generator');
-const { sendOTP } = require('./mailController');
-const { validationResult, matchedData } = require('express-validator');
-const User = require('../models/userModel');
+import PendingUser from '../models/pendingUserModel.js';
+import bcrypt from 'bcrypt';
+import otpGenerator from 'otp-generator';
+import { sendOTP } from './mailController.js';
+import { validationResult, matchedData } from 'express-validator';
+import User from '../models/userModel.js';
 
 const handleRegister = async (req, res) => {
   const errors = validationResult(req);
@@ -79,4 +79,4 @@ const handleValidRegisteration = async ({ userName, email, password }, res, upda
   }
 };
 
-module.exports = { handleRegister };
+export { handleRegister };

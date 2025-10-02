@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import useAuth from '@/stores/authStore';
-import recentChats from '@/lib/mockChats';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,8 +33,6 @@ const Header = () => {
   let { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChat, setSelectedChat] = useState(null);
-
-  user = 4;
 
   return (
     <header className="border-border bg-card flex h-16 items-center gap-4 border-b px-6">

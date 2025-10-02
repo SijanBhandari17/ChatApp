@@ -1,10 +1,11 @@
-const { Router } = require('express');
-const { handleRegister } = require('../controllers/registerController');
-const handleOTP = require('../controllers/otpController');
-const { signupValidator } = require('../utils/validator');
+import { Router } from 'express';
+import { handleRegister } from '../controllers/registerController.js';
+import handleOTP from '../controllers/otpController.js';
+import { signupValidator } from '../utils/validator.js';
 
 const RegisterRouter = Router();
+
 RegisterRouter.post('/', signupValidator, handleRegister);
 RegisterRouter.post('/otp', handleOTP);
 
-module.exports = RegisterRouter;
+export default RegisterRouter;

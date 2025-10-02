@@ -1,7 +1,7 @@
-const forgotPassword = require('../models/forgotPasswordModel');
-const bcrypt = require('bcrypt');
-const User = require('../models/userModel');
-const { validationResult, matchedData } = require('express-validator');
+import forgotPassword from '../models/forgotPasswordModel.js';
+import bcrypt from 'bcrypt';
+import User from '../models/userModel.js';
+import { validationResult, matchedData } from 'express-validator';
 
 const handlePasswordReset = async (req, res) => {
   const errors = validationResult(req);
@@ -49,4 +49,4 @@ const handlePasswordReset = async (req, res) => {
   }
 };
 
-module.exports = { handlePasswordReset };
+export { handlePasswordReset };

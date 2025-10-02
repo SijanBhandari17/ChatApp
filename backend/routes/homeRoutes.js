@@ -1,8 +1,9 @@
-const { Router } = require('express');
-const authenticateRequest = require('../middleware/authenicateJWT');
-const handleHomeRequest = require('../controllers/homeController');
+import { Router } from 'express';
+import authenticateRequest from '../middleware/authenicateJWT.js';
+import handleHomeRequest from '../controllers/homeController.js';
+
 const HomeRouter = Router();
 
 HomeRouter.get('/', authenticateRequest, handleHomeRequest);
 
-module.exports = HomeRouter;
+export default HomeRouter;

@@ -3,4 +3,4 @@ const handleHomeRequest = (req, res) => {
   console.log(userName, email);
   return res.status(200).json({ message: `Hello!, ${userName}` });
 };
-module.exports = handleHomeRequest;
+export default handleHomeRequest;

@@ -1,4 +1,4 @@
-const User = require('../models/userModel');
+import User from '../models/userModel.js';
 
 const handleUserSeach = async (req, res) => {
   const { email } = req.query;
@@ -15,4 +15,4 @@ const handleUserSeach = async (req, res) => {
   }
 };
 
-module.exports = handleUserSeach;
+export default handleUserSeach;

@@ -1,6 +1,6 @@
-const User = require('../models/userModel');
-const jwt = require('jsonwebtoken');
-const generateJWT = require('../utils/generateJWT');
+import User from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
+import generateJWT from '../utils/generateJWT.js';
 
 const handleJWTRefresh = async (req, res) => {
   if (req.cookies?.refreshToken) {
@@ -37,4 +37,5 @@ const handleJWTRefresh = async (req, res) => {
     console.log('error');
   }
 };
-module.exports = handleJWTRefresh;
+
+export default handleJWTRefresh;

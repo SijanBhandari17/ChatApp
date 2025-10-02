@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+import { body } from 'express-validator';
 
 const userNameValidator = body('userName')
   .trim()
@@ -24,9 +24,4 @@ const signupValidator = [userNameValidator, emailValidator, passwordValidator];
 const loginValidator = [emailValidator, passwordValidator];
 const resetPasswordValidator = [passwordValidator, tokenValidator, idValidator];
 
-module.exports = {
-  signupValidator,
-  loginValidator,
-  resetPasswordValidator,
-  passwordValidator,
-};
+export { signupValidator, loginValidator, resetPasswordValidator, passwordValidator };

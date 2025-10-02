@@ -1,12 +1,13 @@
-const { Router } = require('express');
-const {
+import { Router } from 'express';
+import {
   handlePasswordForgot,
   handlePasswordForgotResend,
-} = require('../controllers/forgotPasswordController');
-const { resetLimiter } = require('../middleware/rateLimiter');
+} from '../controllers/forgotPasswordController.js';
+import { resetLimiter } from '../middleware/rateLimiter.js';
+
 const ForgotPasswordRouter = Router();
 
 ForgotPasswordRouter.post('/', resetLimiter, handlePasswordForgot);
 ForgotPasswordRouter.post('/resend', resetLimiter, handlePasswordForgotResend);
 
-module.exports = ForgotPasswordRouter;
+export default ForgotPasswordRouter;
