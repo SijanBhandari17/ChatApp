@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import handleConversationCreation from '../controllers/conversationController.js';
+import { createGroupConversation } from '../controllers/conversationController.js';
 
 const conversationRouter = Router();
 
-conversationRouter.post('/', handleConversationCreation);
+conversationRouter.post('/group', createGroupConversation);
 
 export default conversationRouter;
