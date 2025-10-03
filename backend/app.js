@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { rateLimiter } from './utils/rateLimiter.js';
 
 import connectDb from './config/database.js';
 
@@ -18,6 +19,7 @@ import SearchRouter from './routes/searchRoutes.js';
 import conversationRouter from './routes/createConversationRouter.js';
 import messageRouter from './routes/messagesRouter.js';
 import { initializeRedisClient } from './config/redis.js';
+import helmetConfig from './config/helment.js';
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use(cors(options));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use(rateLimiter);
+app.use(helmetConfig);
 
 connectDb();
 

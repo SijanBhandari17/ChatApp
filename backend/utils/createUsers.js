@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const { faker } = require('@faker-js/faker');
-const User = require('../models/userModel');
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import { faker } from '@faker-js/faker';
+import User from '../models/userModel.js';
 
 async function createRandomUsers(count = 50) {
   await mongoose.connect(process.env.MONGODB_URL);
