@@ -16,8 +16,8 @@ import RefreshRouter from './routes/refreshRoutes.js';
 import ForgotPasswordRouter from './routes/forgotPasswordRoutes.js';
 import ResetPasswordRouter from './routes/passwordResetRoutes.js';
 import SearchRouter from './routes/searchRoutes.js';
-import conversationRouter from './routes/createConversationRouter.js';
-import messageRouter from './routes/messagesRouter.js';
+import ConversationRouter from './routes/createConversationRouter.js';
+import MessageRouter from './routes/messagesRouter.js';
 import { initializeRedisClient } from './config/redis.js';
 import helmetConfig from './config/helment.js';
 
@@ -40,8 +40,8 @@ app.use('/logout', LogoutRouter);
 app.use('/forgot-password', ForgotPasswordRouter);
 app.use('/reset-password', ResetPasswordRouter);
 app.use('/search', SearchRouter);
-app.use('/create-conversation', conversationRouter);
-app.use('/messages', messageRouter);
+app.use('/create-conversation', ConversationRouter);
+app.use('/messages', MessageRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello');

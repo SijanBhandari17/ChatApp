@@ -1,10 +1,16 @@
 import { Router } from 'express';
 import { handleMessageSend } from '../controllers/messagesController.js';
 import { getOrCreateDirectConversation } from '../controllers/conversationController.js';
+import { directConversationValidator, groupConversationvalidator } from '../utils/validator.js';
 
-const messageRouter = Router();
+const MessageRouter = Router();
 
-messageRouter.post('/send/direct', getOrCreateDirectConversation, handleMessageSend);
-messageRouter.post('/send/group', handleMessageSend);
+MessageRouter.post(
+  '/send/direct',
+  directConversationValidator,
+  getOrCreateDirectConversation,
+  handleMessageSend,
+);
+MessageRouter.post('/send/group', handleMessageSend);
 
-export default messageRouter;
+export default MessageRouter;

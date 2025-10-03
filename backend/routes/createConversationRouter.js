@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { createGroupConversation } from '../controllers/conversationController.js';
+import { groupConversationvalidator } from '../utils/validator.js';
 
-const conversationRouter = Router();
+const ConversationRouter = Router();
 
-conversationRouter.post('/group', createGroupConversation);
+ConversationRouter.post('/group', groupConversationvalidator, createGroupConversation);
 
-export default conversationRouter;
+export default ConversationRouter;

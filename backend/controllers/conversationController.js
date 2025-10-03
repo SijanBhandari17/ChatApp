@@ -2,17 +2,14 @@ import { redisClient } from '../config/redis.js';
 import checkConversationCache from '../utils/checkConversationCache.js';
 import Conversation from '../models/conversationModel.js';
 import generateKey from '../utils/generateConversationKey.js';
+import { validationResult, matchedData } from 'express-validator';
 
 const getOrCreateDirectConversation = async (req, res, next) => {
-  const { conversation_type, participants } = req.body;
-
-  if (!conversation_type) {
-    return res.status(400).json({ error: 'Missing field: type' });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
   }
-
-  if (!participants) {
-    return res.status(400).json({ error: 'Missing field: participants' });
-  }
+  const { participants, conversation_type } = matchedData(req);
   try {
     const existingId = await checkConversationCache(participants);
     if (existingId) {
@@ -54,6 +51,30 @@ const getOrCreateDirectConversation = async (req, res, next) => {
   }
 };
 
-const createGroupConversation = async (req, res) => {};
+const createGroupConversation = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
+
+  const { participants, conversation_type, created_by, title } = matchedData(req);
+  try {
+    const insertionResult = await Conversation.create({
+      title,
+      conversation_type,
+      created_by,
+      participants: participants.map(participant => ({
+        user_id: participant,
+        role: participant == created_by ? 'admin' : 'member',
+      })),
+    });
+
+    return res
+      .status(201)
+      .json({ message: 'Succesful coversation creation', body: insertionResult.toObject() });
+  } catch (err) {
+    return res.status(500).json({ error: `An error occurred here: ${err.message}` });
+  }
+};
 
 export { getOrCreateDirectConversation, createGroupConversation };

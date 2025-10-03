@@ -5,12 +5,9 @@ const handleMessageSend = async (req, res) => {
 
   const { sender_id, content, message_type } = req.body;
 
-  if (!conversation_id) return res.status(400).json({ error: 'missin coversatoon_id' });
-
   if (!conversation_id || !sender_id || !content || !message_type) {
     return res.status(400).json({
       error: 'Missing required fields',
-      required: ['conversation_id', 'sender_id', 'content', 'message_type'],
     });
   }
 
