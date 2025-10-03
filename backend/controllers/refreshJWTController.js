@@ -7,6 +7,7 @@ const handleJWTRefresh = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     try {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      console.log(decoded);
       const user = await User.findOne({ email: decoded.email });
 
       if (!user.refresh_token === refreshToken)
@@ -14,7 +15,8 @@ const handleJWTRefresh = async (req, res) => {
 
       const { accessToken, refreshToken: _refreshToken } = generateJWT({
         email: decoded.email,
-        userName: decoded.email,
+        userName: decoded.userName,
+        id: decoded.userId,
       });
 
       res.cookie('refreshToken', _refreshToken, {
@@ -34,7 +36,7 @@ const handleJWTRefresh = async (req, res) => {
       return res.status(500).json({ error: `An error encountered ${err.message}` });
     }
   } else {
-    console.log('error');
+    return res.status(401).json({ error: 'Refresh token expired or invalid' });
   }
 };
 

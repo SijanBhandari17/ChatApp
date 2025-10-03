@@ -4,21 +4,23 @@ import Conversation from '../models/conversationModel.js';
 import generateKey from '../utils/generateConversationKey.js';
 import { validationResult, matchedData } from 'express-validator';
 
-const getOrCreateDirectConversation = async (req, res, next) => {
+const getOrCreateDirectConversation = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ error: errors.array() });
   }
-  const { participants, conversation_type } = matchedData(req);
+  const { participants } = matchedData(req);
+
   try {
     const existingId = await checkConversationCache(participants);
     if (existingId) {
-      req.conversation_id = JSON.parse(existingId);
-      console.log('conversation in cache:', existingId);
-      return next();
+      return res.status(200).json({
+        message: 'Conversation id found',
+        body: { conversation_id: JSON.parse(existingId) },
+      });
     }
+
     const existingConversation = await Conversation.findOne({
-      conversation_type,
       participants: {
         $all: [
           { $elemMatch: { user_id: participants[0] } },
@@ -30,22 +32,23 @@ const getOrCreateDirectConversation = async (req, res, next) => {
     if (existingConversation) {
       const key = generateKey(participants);
       await redisClient.set(key, JSON.stringify(existingConversation._id));
-      console.log('existing conversation :', existingConversation._id);
-      req.conversation_id = existingConversation._id.toString();
-      return next();
+      return res.status(200).json({
+        message: 'Conversation id found',
+        body: { conversation_id: JSON.parse(existingConversation._id) },
+      });
     }
 
     const newConversation = await Conversation.create({
-      conversation_type,
+      conversation_type: 'direct',
       participants: [{ user_id: participants[0] }, { user_id: participants[1] }],
     });
 
     const key = generateKey(participants);
     await redisClient.set(key, JSON.stringify(newConversation._id));
-    console.log('conversation :', newConversation._id);
-
-    req.conversation_id = newConversation._id.toString();
-    return next();
+    return res.status(200).json({
+      message: 'Conversation id found',
+      body: { conversation_id: newConversation._id.toString() },
+    });
   } catch (err) {
     return res.status(500).json({ error: `An error occurred here: ${err.message}` });
   }

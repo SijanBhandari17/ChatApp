@@ -22,14 +22,6 @@ const tokenValidator = body('token').notEmpty().withMessage('Token is required')
 
 const idValidator = body('id').notEmpty().withMessage('Invalid user ID');
 
-const allowedTypes = ['direct', 'group'];
-
-const conversationValidator = body('conversation_type')
-  .notEmpty()
-  .withMessage('Conversation type is missing')
-  .isIn(allowedTypes)
-  .withMessage('Invalid type provided');
-
 const titleValidator = body('title').notEmpty().withMessage('Enter a valid email').trim().escape();
 
 const directParticipantsValidor = body('participants')
@@ -49,13 +41,8 @@ const adminValidator = body('created_by').notEmpty().withMessage('Admin is missi
 const signupValidator = [userNameValidator, emailValidator, passwordValidator];
 const loginValidator = [emailValidator, passwordValidator];
 const resetPasswordValidator = [passwordValidator, tokenValidator, idValidator];
-const directConversationValidator = [conversationValidator, directParticipantsValidor];
-const groupConversationvalidator = [
-  conversationValidator,
-  groupParticipantsValidor,
-  titleValidator,
-  adminValidator,
-];
+const directConversationValidator = [directParticipantsValidor];
+const groupConversationvalidator = [groupParticipantsValidor, titleValidator, adminValidator];
 
 export {
   signupValidator,

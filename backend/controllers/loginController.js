@@ -20,7 +20,7 @@ const handleLogin = async (req, res) => {
     const { accessToken, refreshToken } = generateJWT({
       email: user.email,
       userName: user.userName,
-      id: user._id,
+      id: user._id.toString(),
     });
 
     res.cookie('refreshToken', refreshToken, {
