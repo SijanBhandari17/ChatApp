@@ -43,7 +43,7 @@ app.use('/reset-password', ResetPasswordRouter);
 app.use('/search', SearchRouter);
 app.use('/conversation', ConversationRouter);
 app.use('/messages', MessageRouter);
-app.use('/', DashboardRouter);
+app.use('/dashboard', DashboardRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);

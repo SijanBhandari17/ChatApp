@@ -9,8 +9,6 @@ const authenticateRequest = (req, res, next) => {
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log('authenticaterequest triggered');
-    console.log({ decoded });
     req.user = { email: decoded.email, userName: decoded.userName, userId: decoded.id };
     return next();
   } catch (err) {
