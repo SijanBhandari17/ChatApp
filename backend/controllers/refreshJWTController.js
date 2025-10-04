@@ -7,7 +7,7 @@ const handleJWTRefresh = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     try {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-      console.log(decoded);
+      console.log({ decoded });
       const user = await User.findOne({ email: decoded.email });
 
       if (!user.refresh_token === refreshToken)
@@ -16,7 +16,7 @@ const handleJWTRefresh = async (req, res) => {
       const { accessToken, refreshToken: _refreshToken } = generateJWT({
         email: decoded.email,
         userName: decoded.userName,
-        id: decoded.userId,
+        id: decoded.id,
       });
 
       res.cookie('refreshToken', _refreshToken, {
