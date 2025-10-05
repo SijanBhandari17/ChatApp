@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import useAuth from '@/stores/authStore';
+import { getFromLocalStorage } from '@/lib/saveToLocalStorage';
 
 const useInitializeAuth = () => {
   const { user, setUser, loading, setLoading, initAuth } = useAuth();
@@ -10,7 +11,7 @@ const useInitializeAuth = () => {
       return;
     }
 
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = getFromLocalStorage('accessToken');
     if (!accessToken) {
       setLoading(false);
       return;

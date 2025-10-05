@@ -1,7 +1,7 @@
 import { api } from '@/lib/axiosConfig';
 import { create } from 'zustand';
 
-const useAuthStore = create((set, get) => ({
+const useAuthStore = create(set => ({
   user: null,
   loading: true,
   setUser: user => set({ user }),
