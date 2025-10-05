@@ -10,8 +10,8 @@ const handleJWTRefresh = async (req, res) => {
       console.log({ decoded });
       const user = await User.findOne({ email: decoded.email });
 
-      if (!user.refresh_token === refreshToken)
-        return res.status(403).json({ error: 'Invalid refresh token ' });
+      if (user.refresh_token !== refreshToken)
+        return res.status(401).json({ error: 'Invalid refresh token ' });
 
       const { accessToken, refreshToken: _refreshToken } = generateJWT({
         email: decoded.email,
@@ -31,6 +31,7 @@ const handleJWTRefresh = async (req, res) => {
       return res.status(200).json({ message: 'Successful accessToken renewal', accessToken });
     } catch (err) {
       if (err.name === 'TokenExpiredError') {
+        res.clearCookie('refreshToken');
         return res.status(403).json({ error: 'Refresh Token Expired. Please log in again' });
       }
       return res.status(500).json({ error: `An error encountered ${err.message}` });

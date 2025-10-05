@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
@@ -16,7 +16,8 @@ import { saveToLocalStroage } from '@/lib/saveToLocalStorage';
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
-  const { login, setUser } = useAuth();
+  const { login, setUser, setLoading } = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -30,8 +31,10 @@ const SignInForm = () => {
     setServerError('');
     try {
       const response = await login({ email: data.email, password: data.password });
-      setUser(response.body);
+      setUser(response.data.body);
+      setLoading(false);
       saveToLocalStroage('accessToken', response.data.accessToken);
+      navigate('/dashboard');
     } catch (err) {
       const errorData = err.response?.data.error;
       if (errorData?.msg) {

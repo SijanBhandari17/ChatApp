@@ -9,30 +9,27 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { useState } from 'react';
-import {
-  Search,
-  MessageSquare,
-  Settings,
-  LogOut,
-  MoreVertical,
-  Phone,
-  Video,
-  Users,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Search, MessageSquare, Settings, LogOut, MoreVertical } from 'lucide-react';
 import { Input } from './ui/input';
-
-const navList = [
-  {
-    text: 'Features',
-    href: '#features',
-  },
-];
+import { api } from '@/lib/axiosConfig';
 
 const Header = () => {
-  let { user } = useAuth();
+  const { user, logout, setUser, getUserInfo } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChat, setSelectedChat] = useState(null);
+
+  useEffect(() => {}, [user]);
+
+  const handleLogoutClick = async () => {
+    try {
+      const response = await logout();
+      setUser(null);
+      localStorage.removeItem('accessToken');
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <header className="border-border bg-card flex h-16 items-center gap-4 border-b px-6">
@@ -85,7 +82,7 @@ const Header = () => {
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
+                <DropdownMenuItem onClick={handleLogoutClick} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
@@ -97,11 +94,9 @@ const Header = () => {
         <>
           <div className="container mx-auto flex items-center justify-between px-4 py-4">
             <nav className="mr-auto ml-auto flex items-center gap-6">
-              {navList.map((item, index) => (
-                <a key={index} className="text-sm" href={item.href}>
-                  {item.text}
-                </a>
-              ))}
+              <a className="text-sm" href="#features">
+                Features
+              </a>
             </nav>
             <div className="flex items-center gap-3">
               <Link to="/auth/signin">

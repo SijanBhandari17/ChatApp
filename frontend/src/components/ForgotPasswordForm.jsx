@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import useAuth from '@/stores/authStore';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { cn } from '@/lib/utils';
 import { emailCheckSchema } from '@/lib/validator';
 import axios from 'axios';

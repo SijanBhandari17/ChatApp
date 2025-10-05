@@ -3,6 +3,6 @@ import handleJWTRefresh from '../controllers/refreshJWTController.js';
 
 const RefreshRouter = Router();
 
-RefreshRouter.get('/', handleJWTRefresh);
+RefreshRouter.get('/accesstoken', handleJWTRefresh);
 
 export default RefreshRouter;
