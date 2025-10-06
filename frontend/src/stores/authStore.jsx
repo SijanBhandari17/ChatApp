@@ -26,6 +26,12 @@ const useAuthStore = create(set => ({
   initAuth: async () => {
     return await api.get('dashboard/user-info');
   },
+
+  resetUser: () => {
+    set({
+      user: null,
+    });
+  },
 }));
 
 const useAuth = () => {
@@ -39,6 +45,7 @@ const useAuth = () => {
     setUser,
     setLoading,
     initAuth,
+    resetUser,
   } = useAuthStore();
   return {
     user,
@@ -50,6 +57,7 @@ const useAuth = () => {
     setUser,
     setLoading,
     initAuth,
+    resetUser,
   };
 };
 

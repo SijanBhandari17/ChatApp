@@ -4,6 +4,7 @@ import useConversation from '@/stores/conversationStore';
 import useAuth from '@/stores/authStore';
 import MessageAreaSkeleton from './MessageSkeletion';
 import { formatRelative } from 'date-fns';
+import MessageInput from './MessageInput';
 
 const TextArea = () => {
   const containerRef = useRef(null);
@@ -67,9 +68,7 @@ const TextArea = () => {
     };
 
     const handleScroll = () => {
-      console.log('scrolling');
       if (containerRef.current.scrollTop === 0 && hasNextPage) {
-        console.log('fetching messages');
         fetchMoreMessages();
       }
     };
@@ -106,57 +105,58 @@ const TextArea = () => {
   }
 
   return (
-    <div ref={containerRef} className="bg-muted/20 flex-1 overflow-y-auto p-4">
-      <div className="mx-auto max-w-4xl space-y-4">
-        {messages.map(message => {
-          return (
-            <div
-              key={message._id}
-              className={`flex gap-2 ${message.sender_id === user._id ? 'justify-end' : 'justify-start'}`}
-            >
+    <>
+      <div ref={containerRef} className="bg-muted/20 flex-1 overflow-y-auto p-4">
+        <div className="mx-auto max-w-4xl space-y-4">
+          {messages.map(message => {
+            return (
               <div
-                className={`flex max-w-[70%] flex-col ${message.sender_id === user._id ? 'items-end' : 'items-start'}`}
+                key={message._id}
+                className={`flex gap-2 ${message.sender_id === user._id ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`rounded-2xl px-4 py-2 ${
-                    message.sender_id === user._id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'border-border bg-card border'
-                  }`}
+                  className={`flex max-w-[70%] flex-col ${message.sender_id === user._id ? 'items-end' : 'items-start'}`}
                 >
-                  <p className="break-words">{message.content}</p>
-                </div>
+                  <div
+                    className={`rounded-2xl px-4 py-2 ${
+                      message.sender_id === user._id
+                        ? 'bg-primary text-primary-foreground'
+                        : 'border-border bg-card border'
+                    }`}
+                  >
+                    <p className="break-words">{message.content}</p>
+                  </div>
 
-                <div className="mt-1 flex items-center gap-1 px-3">
-                  <span className="text-muted-foreground text-xs">
-                    {message.createdAt
-                      ? formatRelative(
-                          new Date(selectedConversation.recipient.last_active_at),
-                          new Date(),
-                        )
-                      : ''}
-                    {'  '}
-                    {message.createdAt
-                      ? new Date(message.createdAt).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : message.timestamp}
-                  </span>
-                  {message.sender_id === user._id &&
-                    (message.isRead ? (
-                      <CheckCheck className="h-3 w-3 text-blue-500" />
-                    ) : (
-                      <Check className="text-muted-foreground h-3 w-3" />
-                    ))}
+                  <div className="mt-1 flex items-center gap-1 px-3">
+                    <span className="text-muted-foreground text-xs">
+                      {message.createdAt
+                        ? formatRelative(new Date(message.createdAt), new Date())
+                        : ''}
+                      {'  '}
+                      {message.createdAt
+                        ? new Date(message.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : message.timestamp}
+                    </span>
+                    {message.sender_id === user._id &&
+                      (message.isRead ? (
+                        <CheckCheck className="h-3 w-3 text-blue-500" />
+                      ) : (
+                        <Check className="text-muted-foreground h-3 w-3" />
+                      ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        <div ref={bottomRef} /> {/* marker */}
       </div>
-      <div ref={bottomRef} /> {/* marker */}
-    </div>
+
+      <MessageInput setMessage={setMessages} />
+    </>
   );
 };
 

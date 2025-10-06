@@ -12,15 +12,18 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useState } from 'react';
 import { Search, MessageSquare, Settings, LogOut, MoreVertical } from 'lucide-react';
 import { Input } from './ui/input';
+import useConversation from '@/stores/conversationStore';
 
 const Header = () => {
   const { user, logout, setUser } = useAuth();
+  const { resetConversation } = useConversation();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleLogoutClick = async () => {
     try {
       const response = await logout();
       setUser(null);
+      resetConversation();
       localStorage.removeItem('accessToken');
     } catch (err) {
       console.log(err);
@@ -57,8 +60,8 @@ const Header = () => {
           {/* User Profile */}
           <div className="flex flex-shrink-0 items-center gap-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={user.profile_image} />
+              <AvatarFallback>{user.userName[0]}</AvatarFallback>
             </Avatar>
             <div className="hidden md:block">
               <p className="text-sm font-medium">{user.userName}</p>
