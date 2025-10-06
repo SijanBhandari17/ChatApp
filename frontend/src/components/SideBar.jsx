@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { api } from '@/lib/axiosConfig';
 import { formatDistanceToNow } from 'date-fns';
 import useConversation from '@/stores/conversationStore';
 
@@ -24,7 +23,7 @@ const SideBar = () => {
       }
     };
     getUserConversations();
-  }, []);
+  }, [getConversations, setConversations]);
 
   return (
     <aside className="border-border flex w-80 flex-col overflow-hidden border-r">

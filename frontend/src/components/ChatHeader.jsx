@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
-import { BellOff, Check, CheckCheck, Info, MoreVertical, Trash2 } from 'lucide-react';
+import { BellOff, Info, MoreVertical, Trash2 } from 'lucide-react';
 import { Phone, Video } from 'lucide-react';
 import useConversation from '@/stores/conversationStore';
 import { formatRelative } from 'date-fns';
@@ -12,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import useAuth from '@/stores/authStore';
 
 const CallIcons = () => {
   return (
@@ -50,7 +48,7 @@ const CallIcons = () => {
 };
 
 const ChatHeader = () => {
-  const { selectedConversation, getSelectedConversationMessages } = useConversation();
+  const { selectedConversation } = useConversation();
   return (
     <div className="border-border w-full flex-shrink-0 border-b p-2">
       <div className="flex items-center justify-between">

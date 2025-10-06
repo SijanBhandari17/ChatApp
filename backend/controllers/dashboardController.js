@@ -27,7 +27,12 @@ const getConversations = async (req, res) => {
             },
             { $project: { password: 0, refresh_token: 0 } },
           ],
-          as: 'other_participant_detail',
+          as: 'recipient',
+        },
+      },
+      {
+        $addFields: {
+          recipient: { $arrayElemAt: ['$recipient', 0] },
         },
       },
     ]);

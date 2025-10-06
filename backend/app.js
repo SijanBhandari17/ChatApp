@@ -10,7 +10,6 @@ import options from './config/cors.js';
 
 import RegisterRouter from './routes/registerRoutes.js';
 import LoginRouter from './routes/loginRoutes.js';
-import HomeRouter from './routes/homeRoutes.js';
 import LogoutRouter from './routes/logoutRoutes.js';
 import RefreshRouter from './routes/refreshRoutes.js';
 import ForgotPasswordRouter from './routes/forgotPasswordRoutes.js';
@@ -36,7 +35,6 @@ connectDb();
 app.use('/register', RegisterRouter);
 app.use('/login', LoginRouter);
 app.use('/refresh', RefreshRouter);
-app.use('/home', HomeRouter);
 app.use('/logout', LogoutRouter);
 app.use('/forgot-password', ForgotPasswordRouter);
 app.use('/reset-password', ResetPasswordRouter);

@@ -28,6 +28,7 @@ const handleJWTRefresh = async (req, res) => {
 
       user.refresh_token = _refreshToken;
       await user.save();
+      console.log('access token renewed');
       return res.status(200).json({ message: 'Successful accessToken renewal', accessToken });
     } catch (err) {
       if (err.name === 'TokenExpiredError') {

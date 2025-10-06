@@ -8,19 +8,25 @@ const createAndSendResetLink = async user => {
   const token = crypto.randomBytes(32).toString('hex');
   const hash = await bcrypt.hash(token, 10);
 
-  await ForgotPassword.deleteMany({ userId: user._id });
+  const session = await mongoose.startTransaction();
+  session.startTransaction();
+  try {
+    await ForgotPassword.deleteMany({ userId: user._id });
+    await ForgotPassword.create({
+      userId: user._id,
+      token: hash,
+      expiresAt: Date.now() + 60 * 60 * 1000,
+    });
 
-  await ForgotPassword.create({
-    userId: user._id,
-    token: hash,
-    expiresAt: Date.now() + 60 * 60 * 1000,
-  });
+    const link = `http://localhost:5173/auth/resetpassword?token=${token}&id=${user._id}`;
+    const mailResult = await sendResetLink(user.email, link);
 
-  const link = `http://localhost:5173/auth/resetpassword?token=${token}&id=${user._id}`;
-  console.log(link);
-
-  const mailResult = await sendResetLink(user.email, link);
-  console.log(mailResult);
+    await session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    return res.status(500).json({ error: `An error occurred: ${err.message}` });
+  }
 };
 
 const handlePasswordForgot = async (req, res) => {

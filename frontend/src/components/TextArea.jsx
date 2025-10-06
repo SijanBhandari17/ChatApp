@@ -1,18 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Check, CheckCheck, MessageSquare } from 'lucide-react';
 import useConversation from '@/stores/conversationStore';
 import useAuth from '@/stores/authStore';
-import LoadingScreen from './Loading';
+import MessageAreaSkeleton from './MessageSkeletion';
+import { formatRelative } from 'date-fns';
 
 const TextArea = () => {
   const containerRef = useRef(null);
+  const bottomRef = useRef(null);
   const { selectedConversation, getSelectedConversationMessages } = useConversation();
   const [currentPage, setCurrentPage] = useState(1);
   const [messages, setMessages] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(true);
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-
+  const [shouldAdjustScroll, setShouldAdjustScroll] = useState(false);
+  const previousScrollHeightRef = useRef(0);
   const limit = 50;
 
   useEffect(() => {
@@ -26,12 +29,17 @@ const TextArea = () => {
           page: 1,
           limit,
         });
+
         setMessages(response.data.body);
         setCurrentPage(1);
         setHasNextPage(response.data.pagination.hasNextPage);
-        setLoading(false);
+
+        setTimeout(() => {
+          bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+        }, 100);
       } catch (err) {
         console.log(err);
+      } finally {
         setLoading(false);
       }
     };
@@ -40,15 +48,9 @@ const TextArea = () => {
   }, [selectedConversation]);
 
   useEffect(() => {
-    const container = containerRef.current;
-
-    if (!hasNextPage || !container) return;
-
-    console.log(container?.scrollTop === 0);
-
-    if (container?.scrollTop === 0) return;
-
     const fetchMoreMessages = async () => {
+      previousScrollHeightRef.current = containerRef.current.scrollHeight;
+
       try {
         const response = await getSelectedConversationMessages({
           c_id: selectedConversation._id,
@@ -58,35 +60,38 @@ const TextArea = () => {
         setMessages(prev => [...response.data.body, ...prev]);
         setHasNextPage(response.data.pagination.hasNextPage);
         setCurrentPage(prev => prev + 1);
+        setShouldAdjustScroll(true);
       } catch (err) {
         console.log(err);
-      } finally {
-        setHasNextPage(false);
       }
     };
 
     const handleScroll = () => {
       console.log('scrolling');
-      if (container.scrollTop === 0) {
-        console.log('Top reached');
+      if (containerRef.current.scrollTop === 0 && hasNextPage) {
+        console.log('fetching messages');
         fetchMoreMessages();
       }
     };
+    const container = containerRef.current;
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [selectedConversation]);
-
-  useEffect(() => {
-    if (messages.length > 0 && currentPage === 1) {
-      const container = containerRef.current;
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+    if (!container) {
+      return;
     }
-  }, [selectedConversation, currentPage]);
+    container.addEventListener('scroll', handleScroll);
+    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
+  }, [hasNextPage, messages.length, currentPage]);
 
-  if (loading) return <LoadingScreen className="items-center justify-center" />;
+  useLayoutEffect(() => {
+    if (shouldAdjustScroll && containerRef.current) {
+      const newScrollHeight = containerRef.current.scrollHeight;
+      const heightDifference = newScrollHeight - previousScrollHeightRef.current;
+      containerRef.current.scrollTop = heightDifference;
+      setShouldAdjustScroll(false);
+    }
+  }, [shouldAdjustScroll, messages]);
+
+  if (loading) return <MessageAreaSkeleton />;
 
   if (messages.length === 0) {
     return (
@@ -125,6 +130,13 @@ const TextArea = () => {
                 <div className="mt-1 flex items-center gap-1 px-3">
                   <span className="text-muted-foreground text-xs">
                     {message.createdAt
+                      ? formatRelative(
+                          new Date(selectedConversation.recipient.last_active_at),
+                          new Date(),
+                        )
+                      : ''}
+                    {'  '}
+                    {message.createdAt
                       ? new Date(message.createdAt).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -143,6 +155,7 @@ const TextArea = () => {
           );
         })}
       </div>
+      <div ref={bottomRef} /> {/* marker */}
     </div>
   );
 };

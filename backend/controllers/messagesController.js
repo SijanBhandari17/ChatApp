@@ -9,6 +9,8 @@ const handleMessageSend = async (req, res) => {
       error: 'Missing required fields',
     });
   }
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
     const messageResult = await Message.create({
@@ -29,13 +31,50 @@ const handleMessageSend = async (req, res) => {
     await Conversation.findByIdAndUpdate(conversation_id, {
       $set: { last_message: lastMessage },
     });
+    await session.commitTransaction();
+    session.endSession();
 
-    return res
-      .status(201)
-      .json({ message: 'successful message creation', body: messageResult.toObject() });
+    return res.status(201).json({ message: 'successful message creation', body: messageObject });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    return res.status(500).json({ error: `An  error occurred: ${err.message}` });
+  }
+};
+
+const handleMessageGet = async (req, res) => {
+  const { c_id, page = 1, limit } = req.query;
+  if (!c_id)
+    return res.status(400).json({
+      error: 'Missing required fields',
+    });
+
+  try {
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [messageResult, totalCount] = await Promise.all([
+      Message.find({ conversation_id: c_id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+      Message.countDocuments({ conversation_id: c_id }),
+    ]);
+    const totalPages = Math.ceil(totalCount / Number(limit));
+
+    const messages = messageResult.reverse().map(msg => msg.toObject());
+
+    return res.status(200).json({
+      message: 'successful message retrival',
+      body: messages,
+      pagination: {
+        currentPage: Number(page),
+        totalPages,
+        hasNextPage: Number(page) < totalPages,
+      },
+    });
   } catch (err) {
     return res.status(500).json({ error: `An  error occurred: ${err.message}` });
   }
 };
 
-export { handleMessageSend };
+export { handleMessageSend, handleMessageGet };

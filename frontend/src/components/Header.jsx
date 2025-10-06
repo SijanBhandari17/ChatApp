@@ -16,7 +16,6 @@ import { Input } from './ui/input';
 const Header = () => {
   const { user, logout, setUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedChat, setSelectedChat] = useState(null);
 
   const handleLogoutClick = async () => {
     try {

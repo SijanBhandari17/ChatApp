@@ -28,6 +28,7 @@ export default [
         URLSearchParams: 'readonly',
         localStorage: 'readonly',
         sessionStorage: 'readonly', // You may need more depending on what you're using
+        setTimeout: 'readonly',
       },
       parserOptions: {
         ecmaFeatures: {
