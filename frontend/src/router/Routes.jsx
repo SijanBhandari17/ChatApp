@@ -31,7 +31,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/auth',
-    element: <AuthPage />,
+    element: (
+      <PublicRoute>
+        <AuthPage />
+      </PublicRoute>
+    ),
     children: [
       { path: ':tab', element: <AuthForm /> },
       { path: 'otp', element: <OTPForm /> },

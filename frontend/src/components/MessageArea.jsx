@@ -1,94 +1,56 @@
-import { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { MessageSquare } from 'lucide-react';
-import { Phone, Users, Video } from 'lucide-react';
+import { Paperclip, Send, Smile, Users } from 'lucide-react';
+import useConversation from '@/stores/conversationStore';
+import ChatHeader from './ChatHeader';
+import TextArea from './TextArea';
 
 const MessageArea = () => {
+  const { selectedConversation } = useConversation();
+
   return (
-    <div className="flex flex-1 flex-col">
-      {/* {selectedChat ? ( */}
-      {/*   <> */}
-      {/*     <div className="border-border border-b p-4"> */}
-      {/*       <div className="flex items-center justify-between"> */}
-      {/*         <div className="flex items-center gap-3"> */}
-      {/*           {(() => { */}
-      {/*             const chat = recentChats.find(c => c.id === selectedChat); */}
-      {/*             if (!chat) return null; */}
-      {/**/}
-      {/*             return ( */}
-      {/*               <> */}
-      {/*                 <Avatar className="h-10 w-10"> */}
-      {/*                   {chat.avatar ? <AvatarImage src={chat.avatar} /> : null} */}
-      {/*                   <AvatarFallback className={getAvatarBg(chat.type)}> */}
-      {/*                     {getInitials(chat.name)} */}
-      {/*                   </AvatarFallback> */}
-      {/*                 </Avatar> */}
-      {/*                 <div> */}
-      {/*                   <h2 className="font-semibold">{chat.name}</h2> */}
-      {/*                   <p className="text-muted-foreground text-sm"> */}
-      {/*                     {chat.type === 'direct' */}
-      {/*                       ? chat.isOnline */}
-      {/*                         ? 'Online' */}
-      {/*                         : 'Last seen 2h ago' */}
-      {/*                       : `${Math.floor(Math.random() * 10) + 3} members`} */}
-      {/*                   </p> */}
-      {/*                 </div> */}
-      {/*               </> */}
-      {/*             ); */}
-      {/*           })()} */}
-      {/*         </div> */}
-      {/**/}
-      {/*         <div className="flex items-center gap-2"> */}
-      {/*           <Button variant="ghost" size="sm"> */}
-      {/*             <Phone className="h-4 w-4" /> */}
-      {/*           </Button> */}
-      {/*           <Button variant="ghost" size="sm"> */}
-      {/*             <Video className="h-4 w-4" /> */}
-      {/*           </Button> */}
-      {/*           <Button variant="ghost" size="sm"> */}
-      {/*             <MoreVertical className="h-4 w-4" /> */}
-      {/*           </Button> */}
-      {/*         </div> */}
-      {/*       </div> */}
-      {/*     </div> */}
-      {/**/}
-      {/*     <div className="bg-muted/20 flex flex-1 items-center justify-center"> */}
-      {/*       <div className="text-center"> */}
-      {/*         <MessageSquare className="text-muted-foreground mx-auto mb-4 h-16 w-16" /> */}
-      {/*         <h3 className="mb-2 text-lg">Start your conversation</h3> */}
-      {/*         <p className="text-muted-foreground"> */}
-      {/*           Send a message to get the conversation started! */}
-      {/*         </p> */}
-      {/*       </div> */}
-      {/*     </div> */}
-      {/**/}
-      {/*     <div className="border-border border-t p-4"> */}
-      {/*       <div className="flex items-center gap-2"> */}
-      {/*         <Input placeholder="Type a message..." className="flex-1" /> */}
-      {/*         <Button>Send</Button> */}
-      {/*       </div> */}
-      {/*     </div> */}
-      {/*   </> */}
-      {/* ) : ( */}
-      {/*   <div className="bg-muted/20 flex flex-1 items-center justify-center"> */}
-      {/*     <div className="max-w-md text-center"> */}
-      {/*       <div className="bg-primary mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full p-6"> */}
-      {/*         <MessageSquare className="text-primary-foreground h-8 w-8" /> */}
-      {/*       </div> */}
-      {/*       <h2 className="mb-4 text-2xl">Welcome to ConnectNow</h2> */}
-      {/*       <p className="text-muted-foreground mb-6"> */}
-      {/*         Select a conversation from the sidebar to start chatting, or create a new conversation */}
-      {/*         to connect with someone new. */}
-      {/*       </p> */}
-      {/*       <Button> */}
-      {/*         <Users className="mr-2 h-4 w-4" /> */}
-      {/*         Start New Chat */}
-      {/*       </Button> */}
-      {/*     </div> */}
-      {/*   </div> */}
-      {/* )} */}
+    <div className="bg-sidebar-accent/10 flex w-full flex-1 flex-col overflow-hidden">
+      {selectedConversation ? (
+        <>
+          <ChatHeader />
+          <TextArea />
+          <div className="border-border bg-card w-full flex-shrink-0 border-t p-4">
+            <div className="mx-auto flex max-w-4xl items-end gap-2">
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
+                <Paperclip className="h-4 w-4" />
+              </Button>
+
+              <div className="relative flex-1">
+                <Input placeholder="Type a message..." className="pr-10" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-1/2 right-1 -translate-y-1/2"
+                >
+                  <Smile className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <Button className="flex-shrink-0">
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="bg-muted/20 flex flex-1 items-center justify-center">
+          <div className="max-w-md text-center">
+            <p className="text-muted-foreground mb-6">
+              Select a conversation from the sidebar to start chatting, or create a new conversation
+              to connect with someone new.
+            </p>
+            <Button>
+              <Users className="mr-2 h-4 w-4" />
+              Start New Chat
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

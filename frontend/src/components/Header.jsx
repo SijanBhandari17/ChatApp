@@ -9,17 +9,14 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Search, MessageSquare, Settings, LogOut, MoreVertical } from 'lucide-react';
 import { Input } from './ui/input';
-import { api } from '@/lib/axiosConfig';
 
 const Header = () => {
-  const { user, logout, setUser, getUserInfo } = useAuth();
+  const { user, logout, setUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChat, setSelectedChat] = useState(null);
-
-  useEffect(() => {}, [user]);
 
   const handleLogoutClick = async () => {
     try {
@@ -65,8 +62,7 @@ const Header = () => {
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             <div className="hidden md:block">
-              <p className="text-sm font-medium">John Doe</p>
-              <p className="text-muted-foreground text-xs">Online</p>
+              <p className="text-sm font-medium">{user.userName}</p>
             </div>
 
             {/* Dropdown */}
