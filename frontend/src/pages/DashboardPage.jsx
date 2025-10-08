@@ -4,9 +4,9 @@ import MessageArea from '@/components/MessageArea';
 
 const DashBoard = () => {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="flex flex-1">
+    <div className="flex h-screen flex-col overflow-hidden">
+      <Header className="flex-shrink-0" />
+      <main className="flex flex-1 overflow-hidden">
         <SideBar />
         <MessageArea />
       </main>

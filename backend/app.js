@@ -1,51 +1,61 @@
-require('dotenv').config();
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { rateLimiter } from './utils/rateLimiter.js';
 
-const express = require('express');
-const cors = require('cors');
-const connectDb = require('./config/database');
-const { default: mongoose } = require('mongoose');
-const RegisterRouter = require('./routes/registerRoutes');
-const LoginRouter = require('./routes/loginRoutes');
-const RefreshRouter = require('./routes/refreshroute');
-const HomeRouter = require('./routes/homeRoutes');
-const cookieParser = require('cookie-parser');
-const LogoutRouter = require('./routes/logoutRoutes');
-const ForgotPasswordRouter = require('./routes/forgotPasswordRoutes');
-const ResetPasswordRouter = require('./routes/passwordResetRoutes');
-const options = require('./config/cors');
-const SearchRouter = require('./routes/searchRoutes');
-const createRandomUsers = require('./utils/createUsers');
+import connectDb from './config/database.js';
+
+import options from './config/cors.js';
+
+import RegisterRouter from './routes/registerRoutes.js';
+import LoginRouter from './routes/loginRoutes.js';
+import LogoutRouter from './routes/logoutRoutes.js';
+import RefreshRouter from './routes/refreshRoutes.js';
+import ForgotPasswordRouter from './routes/forgotPasswordRoutes.js';
+import ResetPasswordRouter from './routes/passwordResetRoutes.js';
+import SearchRouter from './routes/searchRoutes.js';
+import ConversationRouter from './routes/conversationRouter.js';
+import MessageRouter from './routes/messagesRouter.js';
+import { initializeRedisClient } from './config/redis.js';
+import helmetConfig from './config/helment.js';
+import DashboardRouter from './routes/dashboardRouter.js';
 
 const app = express();
-const PORT = process.env.PORT;
-
-connectDb();
 
 app.use(cors(options));
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use(rateLimiter);
+app.use(helmetConfig);
+
+connectDb();
 
 app.use('/register', RegisterRouter);
 app.use('/login', LoginRouter);
 app.use('/refresh', RefreshRouter);
-app.use('/home', HomeRouter);
 app.use('/logout', LogoutRouter);
 app.use('/forgot-password', ForgotPasswordRouter);
 app.use('/reset-password', ResetPasswordRouter);
 app.use('/search', SearchRouter);
-
-app.get('/', (req, res) => {
-  res.send('Hello');
-});
+app.use('/conversation', ConversationRouter);
+app.use('/messages', MessageRouter);
+app.use('/dashboard', DashboardRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
 });
 
-mongoose.connection.on('connected', () => {
-  app.listen(PORT, error => {
-    if (error) throw error;
-    console.log(`Server listening on ${PORT}`);
-  });
-});
+async function startServer() {
+  try {
+    await connectDb();
+    await initializeRedisClient();
+    app.listen(process.env.PORT || 3000, () =>
+      console.log(`Server running on port ${process.env.PORT || 3000}`),
+    );
+  } catch (err) {
+    console.error('Startup failed:', err);
+  }
+}
+startServer();

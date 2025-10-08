@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import { mongoose } from 'mongoose';
 
 const pendingUserSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
@@ -10,4 +10,4 @@ const pendingUserSchema = new mongoose.Schema({
 
 const PendingUser = mongoose.model('pendingUser', pendingUserSchema);
 
-module.exports = PendingUser;
+export default PendingUser;

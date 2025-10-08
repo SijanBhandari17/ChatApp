@@ -33,7 +33,7 @@ const SignupForm = () => {
       });
       navigate('/auth/otp', { state: { email: data.email } });
     } catch (err) {
-      if (err.response.status == 409) {
+      if (err.response?.status == 409) {
         setServerError(err.response.data.error);
       }
       console.log(err);

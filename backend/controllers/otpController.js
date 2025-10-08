@@ -1,7 +1,7 @@
-const PendingUser = require('../models/pendingUserModel');
-const bcrypt = require('bcrypt');
-const User = require('../models/userModel');
-const generateJWT = require('../utils/generateJWT');
+import PendingUser from '../models/pendingUserModel.js';
+import bcrypt from 'bcrypt';
+import User from '../models/userModel.js';
+import generateJWT from '../utils/generateJWT.js';
 
 const handleOTP = async (req, res) => {
   const { email, otp } = req.body;
@@ -25,7 +25,7 @@ const handleOTP = async (req, res) => {
     const { accessToken, refreshToken } = generateJWT({
       userName: pendingUser.userName,
       email: pendingUser.email,
-      id: pendingUser._id,
+      id: pendingUser._id.toString(),
     });
 
     res.cookie('refreshToken', refreshToken, {
@@ -48,4 +48,4 @@ const handleOTP = async (req, res) => {
   }
 };
 
-module.exports = handleOTP;
+export default handleOTP;

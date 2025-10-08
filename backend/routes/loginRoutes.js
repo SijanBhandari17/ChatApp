@@ -1,8 +1,11 @@
-const { Router } = require('express');
-const handleLogin = require('../controllers/loginController');
-const { loginValidator } = require('../utils/validator');
+// loginRoutes.js
+
+import { Router } from 'express';
+import handleLogin from '../controllers/loginController.js';
+import { loginValidator } from '../utils/validator.js';
+
 const LoginRouter = Router();
 
 LoginRouter.post('/', loginValidator, handleLogin);
 
-module.exports = LoginRouter;
+export default LoginRouter;

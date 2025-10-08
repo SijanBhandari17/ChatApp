@@ -1,4 +1,4 @@
-const User = require('../models/userModel');
+import User from '../models/userModel.js';
 
 const handleLogout = async (req, res) => {
   try {
@@ -18,4 +18,4 @@ const handleLogout = async (req, res) => {
   }
 };
 
-module.exports = handleLogout;
+export default handleLogout;

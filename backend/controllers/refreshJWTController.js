@@ -1,6 +1,6 @@
-const User = require('../models/userModel');
-const jwt = require('jsonwebtoken');
-const generateJWT = require('../utils/generateJWT');
+import User from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
+import generateJWT from '../utils/generateJWT.js';
 
 const handleJWTRefresh = async (req, res) => {
   if (req.cookies?.refreshToken) {
@@ -9,13 +9,17 @@ const handleJWTRefresh = async (req, res) => {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
       const user = await User.findOne({ email: decoded.email });
 
-      if (!user.refresh_token === refreshToken)
-        return res.status(403).json({ error: 'Invalid refresh token ' });
+      if (user.refresh_token !== refreshToken)
+        return res.status(401).json({ error: 'Invalid refresh token ' });
 
       const { accessToken, refreshToken: _refreshToken } = generateJWT({
         email: decoded.email,
-        userName: decoded.email,
+        userName: decoded.userName,
+        id: decoded.id,
       });
+
+      user.refresh_token = _refreshToken;
+      await user.save();
 
       res.cookie('refreshToken', _refreshToken, {
         httpOnly: true,
@@ -23,18 +27,17 @@ const handleJWTRefresh = async (req, res) => {
         sameSite: 'Lax',
         maxAge: 24 * 60 * 60 * 1000,
       });
-
-      user.refresh_token = _refreshToken;
-      await user.save();
       return res.status(200).json({ message: 'Successful accessToken renewal', accessToken });
     } catch (err) {
       if (err.name === 'TokenExpiredError') {
+        res.clearCookie('refreshToken');
         return res.status(403).json({ error: 'Refresh Token Expired. Please log in again' });
       }
       return res.status(500).json({ error: `An error encountered ${err.message}` });
     }
   } else {
-    console.log('error');
+    return res.status(401).json({ error: 'Refresh token expired or invalid' });
   }
 };
-module.exports = handleJWTRefresh;
+
+export default handleJWTRefresh;

@@ -1,26 +1,62 @@
+import { api } from '@/lib/axiosConfig';
 import { create } from 'zustand';
-import axios from 'axios';
 
-const useAuthStore = create(set => ({
+const useAuthStore = create((set, store) => ({
   user: null,
-
+  loading: true,
   setUser: user => set({ user }),
+  setLoading: loading => set({ loading }),
+
   login: async userData => {
-    return await axios.post('http://localhost:3000/login', userData, { withCredentials: true });
+    return await api.post('login', userData, { withCredentials: true });
   },
 
   forgotPassword: async userData => {
-    return await axios.post('http://localhost:3000/forgot-password', userData);
+    return await api.post('forgot-password', userData);
   },
 
   resetPassword: async userData => {
-    return await axios.post('http://localhost:3000/reset-password', userData);
+    return await api.post('reset-password', userData);
+  },
+
+  logout: async () => {
+    return await api.get('logout', { withCredentials: true });
+  },
+
+  initAuth: async () => {
+    return await api.get('dashboard/user-info');
+  },
+
+  resetUser: () => {
+    set(store.getInitialState);
   },
 }));
 
 const useAuth = () => {
-  const { user, login, logout, forgotPassword, resetPassword, setUser } = useAuthStore();
-  return { user, login, logout, forgotPassword, resetPassword, setUser };
+  const {
+    user,
+    login,
+    logout,
+    loading,
+    forgotPassword,
+    resetPassword,
+    setUser,
+    setLoading,
+    initAuth,
+    resetUser,
+  } = useAuthStore();
+  return {
+    user,
+    login,
+    logout,
+    loading,
+    forgotPassword,
+    resetPassword,
+    setUser,
+    setLoading,
+    initAuth,
+    resetUser,
+  };
 };
 
 export default useAuth;

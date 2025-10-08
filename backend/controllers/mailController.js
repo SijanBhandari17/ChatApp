@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const generateTransporter = () => {
   return {
@@ -59,4 +59,4 @@ const sendResetLink = async (recipientEmail, resetLink) => {
   }
 };
 
-module.exports = { sendOTP, sendResetLink };
+export { sendOTP, sendResetLink };

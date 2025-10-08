@@ -1,7 +1,7 @@
-const User = require('../models/userModel');
-const bcrypt = require('bcrypt');
-const generateJWT = require('../utils/generateJWT');
-const { validationResult, matchedData } = require('express-validator');
+import User from '../models/userModel.js';
+import bcrypt from 'bcrypt';
+import generateJWT from '../utils/generateJWT.js';
+import { validationResult, matchedData } from 'express-validator';
 
 const handleLogin = async (req, res) => {
   const errors = validationResult(req);
@@ -20,7 +20,7 @@ const handleLogin = async (req, res) => {
     const { accessToken, refreshToken } = generateJWT({
       email: user.email,
       userName: user.userName,
-      id: user._id,
+      id: user._id.toString(),
     });
 
     res.cookie('refreshToken', refreshToken, {
@@ -39,4 +39,4 @@ const handleLogin = async (req, res) => {
   }
 };
 
-module.exports = handleLogin;
+export default handleLogin;

@@ -7,21 +7,35 @@ import ForgotPasswordForm from '@/components/ForgotPasswordForm';
 import AuthForm from '@/components/AuthForm';
 import ResetPasswordForm from '@/components/ResetPasswordForm';
 import DashBoard from '@/pages/DashboardPage';
+import { ProtectedRoute } from './ProtectedRoute';
+import { PublicRoute } from './PublicRoute';
 
 const router = createBrowserRouter([
   {
     path: '/dashboard',
-    element: <DashBoard />,
+    element: (
+      <ProtectedRoute>
+        <DashBoard />
+      </ProtectedRoute>
+    ),
     errorElement: <RouterErrorElement />,
   },
   {
     path: '/',
-    element: <LandingPage />,
+    element: (
+      <PublicRoute>
+        <LandingPage />
+      </PublicRoute>
+    ),
     errorElement: <RouterErrorElement />,
   },
   {
     path: '/auth',
-    element: <AuthPage />,
+    element: (
+      <PublicRoute>
+        <AuthPage />
+      </PublicRoute>
+    ),
     children: [
       { path: ':tab', element: <AuthForm /> },
       { path: 'otp', element: <OTPForm /> },
