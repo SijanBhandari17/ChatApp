@@ -168,7 +168,7 @@ const TextArea = () => {
         </div>
         <div ref={bottomRef} /> {/* marker */}
       </div>
-      <MessageInput setMessage={setMessages} />
+      <MessageInput setMessage={setMessages} bottomRef={bottomRef} />
     </>
   );
 };

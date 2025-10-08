@@ -57,7 +57,7 @@ const ChatHeader = () => {
             <>
               <Avatar className="h-10 w-10">
                 {selectedConversation.recipient ? (
-                  <AvatarImage src={selectedConversation.recipient[0]?.profile_image} />
+                  <AvatarImage src={selectedConversation.recipient[0]?.profile_image_url} />
                 ) : null}
                 <AvatarFallback>
                   {selectedConversation.recipient[0]?.userName?.[0]?.toUpperCase()}

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import useConversation from '@/stores/conversationStore';
 import useAuth from '@/stores/authStore';
 
-const MessageInput = ({ setMessage }) => {
+const MessageInput = ({ setMessage, bottomRef }) => {
   const { selectedConversation, sendDirectMessage, updateConversations } = useConversation();
   const { user } = useAuth();
   const [inputMessage, setInputMessage] = useState('');
@@ -24,6 +24,9 @@ const MessageInput = ({ setMessage }) => {
       setMessage(prev => [...prev, response.data.body]);
       updateConversations(selectedConversation._id, response.data.body);
       setInputMessage('');
+      setTimeout(() => {
+        bottomRef?.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
       console.log(response.data.body);
     } catch (err) {
       console.error(err);

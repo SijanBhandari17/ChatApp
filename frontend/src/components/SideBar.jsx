@@ -43,7 +43,7 @@ const SideBar = () => {
                   <>
                     <Avatar className="h-12 w-12">
                       {chat.recipient ? (
-                        <AvatarImage src={chat.recipient[0]?.profile_image} />
+                        <AvatarImage src={chat.recipient[0]?.profile_image_url} />
                       ) : null}
                       <AvatarFallback className="bg-black/10">
                         {chat.recipient[0]?.userName?.[0]?.toUpperCase()}

@@ -10,10 +10,11 @@ import {
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useState } from 'react';
-import { Search, MessageSquare, Settings, LogOut, MoreVertical, Users } from 'lucide-react';
+import { Search, MessageSquare, LogOut, MoreVertical } from 'lucide-react';
 import { Input } from './ui/input';
 import useConversation from '@/stores/conversationStore';
 import GroupChatForm from './GroupChat';
+import ProfilePicDialog from './ProfilePicDialog';
 
 const Header = () => {
   const { user, logout, setUser } = useAuth();
@@ -22,7 +23,7 @@ const Header = () => {
 
   const handleLogoutClick = async () => {
     try {
-      const response = await logout();
+      await logout();
       setUser(null);
       resetConversation();
       localStorage.removeItem('accessToken');
@@ -61,7 +62,7 @@ const Header = () => {
           {/* User Profile */}
           <div className="flex flex-shrink-0 items-center gap-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user.profile_image} />
+              <AvatarImage src={user.profile_image_url} className="object-cover" />
               <AvatarFallback>{user.userName[0]}</AvatarFallback>
             </Avatar>
             <div className="hidden md:block">
@@ -76,11 +77,8 @@ const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <ProfilePicDialog />
                 <GroupChatForm />
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogoutClick} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />

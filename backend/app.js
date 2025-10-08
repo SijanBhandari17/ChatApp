@@ -20,6 +20,7 @@ import MessageRouter from './routes/messagesRouter.js';
 import { initializeRedisClient } from './config/redis.js';
 import helmetConfig from './config/helment.js';
 import DashboardRouter from './routes/dashboardRouter.js';
+import ProfileImageRouter from './routes/profileImageRouter.js';
 
 const app = express();
 
@@ -42,9 +43,11 @@ app.use('/search', SearchRouter);
 app.use('/conversation', ConversationRouter);
 app.use('/messages', MessageRouter);
 app.use('/dashboard', DashboardRouter);
+app.use('/upload/', ProfileImageRouter);
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error('here', err);
+  return res.status(400).json({ error: err.message });
 });
 
 async function startServer() {
