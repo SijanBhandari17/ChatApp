@@ -1,7 +1,7 @@
 import { api } from '@/lib/axiosConfig';
 import { create } from 'zustand';
 
-const useAuthStore = create(set => ({
+const useAuthStore = create((set, store) => ({
   user: null,
   loading: true,
   setUser: user => set({ user }),
@@ -28,9 +28,7 @@ const useAuthStore = create(set => ({
   },
 
   resetUser: () => {
-    set({
-      user: null,
-    });
+    set(store.getInitialState);
   },
 }));
 

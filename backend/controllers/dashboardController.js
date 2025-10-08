@@ -5,10 +5,11 @@ import User from '../models/userModel.js';
 const getConversations = async (req, res) => {
   const { userId } = req.user;
   if (!userId) return res.status(400).json({ error: 'No user found' });
+
   try {
     const usersConversations = await Conversation.aggregate([
       { $match: { 'participants.user_id': new mongoose.Types.ObjectId(userId) } },
-      { $sort: { 'last_message.created_at': -1 } },
+      { $sort: { 'last_message.createdAt': -1 } },
       { $limit: 15 },
       {
         $lookup: {
@@ -19,7 +20,7 @@ const getConversations = async (req, res) => {
               $match: {
                 $expr: {
                   $and: [
-                    { $in: ['$_id'.toString(), '$$participantsIds'] },
+                    { $in: ['$_id', '$$participantsIds'] },
                     { $ne: ['$_id', new mongoose.Types.ObjectId(userId)] },
                   ],
                 },
@@ -30,14 +31,9 @@ const getConversations = async (req, res) => {
           as: 'recipient',
         },
       },
-      {
-        $addFields: {
-          recipient: { $arrayElemAt: ['$recipient', 0] },
-        },
-      },
     ]);
+    console.log(usersConversations);
 
-    console.log(JSON.stringify(usersConversations, null, 2));
     return res.status(200).json({
       message: 'Conversations returned successfully',
       body: usersConversations,

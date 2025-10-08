@@ -1,11 +1,18 @@
 import { create } from 'zustand';
 import { api } from '@/lib/axiosConfig';
 
-const conversationStore = create(set => ({
+const conversationStore = create((set, store) => ({
   conversations: null,
   selectedConversation: null,
   setConversations: conversations => set({ conversations }),
   setSelectedConversation: selectedConversation => set({ selectedConversation }),
+
+  updateConversations: (id, message) =>
+    set(state => ({
+      conversations: state.conversations.map(conversation =>
+        conversation._id === id ? { ...conversation, last_message: message } : conversation,
+      ),
+    })),
 
   getConversations: async () => {
     return await api.get('/dashboard/conversations');
@@ -19,10 +26,7 @@ const conversationStore = create(set => ({
     return await api.post('/messages/send/direct', messageData);
   },
   resetConversation: () => {
-    set({
-      conversations: null,
-      selectedConversation: null,
-    });
+    set(store.getInitiailState());
   },
 }));
 
@@ -36,6 +40,7 @@ const useConversation = () => {
     sendDirectMessage,
     setSelectedConversation,
     resetConversation,
+    updateConversations,
   } = conversationStore();
   return {
     conversations,
@@ -46,6 +51,7 @@ const useConversation = () => {
     setConversations,
     setSelectedConversation,
     resetConversation,
+    updateConversations,
   };
 };
 

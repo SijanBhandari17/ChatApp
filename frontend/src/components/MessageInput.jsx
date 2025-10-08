@@ -6,7 +6,7 @@ import useConversation from '@/stores/conversationStore';
 import useAuth from '@/stores/authStore';
 
 const MessageInput = ({ setMessage }) => {
-  const { selectedConversation, sendDirectMessage } = useConversation();
+  const { selectedConversation, sendDirectMessage, updateConversations } = useConversation();
   const { user } = useAuth();
   const [inputMessage, setInputMessage] = useState('');
 
@@ -20,6 +20,7 @@ const MessageInput = ({ setMessage }) => {
         message_type: 'text',
       });
       setMessage(prev => [...prev, response.data.body]);
+      updateConversations(selectedConversation._id, response.data.body);
       setInputMessage('');
       console.log(response.data.body);
     } catch (err) {

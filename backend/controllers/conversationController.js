@@ -60,11 +60,11 @@ const createGroupConversation = async (req, res) => {
     return res.status(400).json({ error: errors.array() });
   }
 
-  const { participants, conversation_type, created_by, title } = matchedData(req);
+  const { participants, created_by, title } = matchedData(req);
   try {
     const insertionResult = await Conversation.create({
       title,
-      conversation_type,
+      conversation_type: 'group',
       created_by,
       participants: participants.map(participant => ({
         user_id: participant,

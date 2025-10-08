@@ -57,26 +57,41 @@ const ChatHeader = () => {
             <>
               <Avatar className="h-10 w-10">
                 {selectedConversation.recipient ? (
-                  <AvatarImage src={selectedConversation.recipient?.profile_image} />
+                  <AvatarImage src={selectedConversation.recipient[0]?.profile_image} />
                 ) : null}
                 <AvatarFallback>
-                  {selectedConversation.recipient?.userName?.[0]?.toUpperCase()}
+                  {selectedConversation.recipient[0]?.userName?.[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold">{selectedConversation.recipient.userName}</h2>
+                <h2 className="font-semibold">{selectedConversation.recipient[0]?.userName}</h2>
                 <p className="text-muted-foreground text-sm">
-                  {selectedConversation.type === 'direct' &&
+                  {selectedConversation.conversation_type === 'direct' &&
                   selectedConversation.recipient?.notActive
                     ? 'Online'
                     : `Last seen at ${formatRelative(
-                        new Date(selectedConversation.recipient.last_active_at),
+                        new Date(selectedConversation.recipient[0].last_active_at),
                         new Date(),
                       )}`}
                 </p>
               </div>
             </>
-          ) : null}
+          ) : (
+            <>
+              <Avatar className="h-10 w-10">
+                {selectedConversation.recipient ? (
+                  <AvatarImage src={selectedConversation.recipient?.profile_image} />
+                ) : null}
+                <AvatarFallback>{selectedConversation.title?.[0]?.toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="font-semibold">{selectedConversation.title}</h2>
+                <p className="text-muted-foreground text-sm">
+                  {selectedConversation.participants?.length} participants
+                </p>
+              </div>
+            </>
+          )}
         </div>
         <CallIcons />
       </div>

@@ -30,7 +30,6 @@ const SideBar = () => {
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
           <h3 className="text-muted-foreground px-2 py-3 text-sm font-medium">Recent Chats</h3>
-
           {conversations?.map(chat => (
             <div
               key={chat._id}
@@ -43,29 +42,44 @@ const SideBar = () => {
                 {chat.conversation_type === 'direct' ? (
                   <>
                     <Avatar className="h-12 w-12">
-                      {chat.recipient ? <AvatarImage src={chat.recipient?.profile_image} /> : null}
+                      {chat.recipient ? (
+                        <AvatarImage src={chat.recipient[0]?.profile_image} />
+                      ) : null}
                       <AvatarFallback className="bg-black/10">
-                        {chat.recipient?.userName?.[0]?.toUpperCase()}
+                        {chat.recipient[0]?.userName?.[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     {chat.isOnline && (
                       <div className="border-background absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 bg-green-500"></div>
                     )}
                   </>
-                ) : null}
+                ) : (
+                  <>
+                    <Avatar className="h-12 w-12">
+                      {chat.recipient ? <AvatarImage src={chat.group_image} /> : null}
+                      <AvatarFallback className="bg-black/10">
+                        {chat.title?.[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </>
+                )}
               </div>
 
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center justify-between">
-                  <p className="truncate font-medium">{chat.recipient?.userName}</p>
+                  <p className="truncate font-medium">
+                    {chat.title ? chat.title : chat.recipient[0]?.userName}
+                  </p>
                   <span className="text-muted-foreground text-xs">
-                    {formatDistanceToNow(new Date(chat.last_message.created_at), {
-                      addSuffix: true,
-                    })}
+                    {chat.last_message?.createdAt
+                      ? formatDistanceToNow(new Date(chat.last_message?.createdAt), {
+                          addSuffix: true,
+                        })
+                      : ''}
                   </span>
                 </div>
                 <p className="text-muted-foreground truncate text-sm">
-                  {chat.last_message.content}
+                  {chat.last_message?.content}
                 </p>
               </div>
 

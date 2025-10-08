@@ -10,9 +10,10 @@ import {
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useState } from 'react';
-import { Search, MessageSquare, Settings, LogOut, MoreVertical } from 'lucide-react';
+import { Search, MessageSquare, Settings, LogOut, MoreVertical, Users } from 'lucide-react';
 import { Input } from './ui/input';
 import useConversation from '@/stores/conversationStore';
+import GroupChatForm from './GroupChat';
 
 const Header = () => {
   const { user, logout, setUser } = useAuth();
@@ -75,6 +76,7 @@ const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <GroupChatForm />
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
                   Settings

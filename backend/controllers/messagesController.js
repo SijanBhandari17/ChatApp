@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Conversation from '../models/conversationModel.js';
 import Message from '../models/messageModel.js';
 
@@ -24,7 +25,7 @@ const handleMessageSend = async (req, res) => {
     const lastMessage = {
       message_type: messageObject.message_type,
       content: messageObject.content,
-      created_at: messageObject.createdAt,
+      createdAt: messageObject.createdAt,
       message_id: messageObject._id,
     };
 

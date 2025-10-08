@@ -22,7 +22,7 @@ const tokenValidator = body('token').notEmpty().withMessage('Token is required')
 
 const idValidator = body('id').notEmpty().withMessage('Invalid user ID');
 
-const titleValidator = body('title').notEmpty().withMessage('Enter a valid email').trim().escape();
+const titleValidator = body('title').notEmpty().withMessage('Enter a valid title').trim().escape();
 
 const directParticipantsValidor = body('participants')
   .isArray({ max: 2 })
@@ -31,7 +31,7 @@ const directParticipantsValidor = body('participants')
   .withMessage('Participants array cannot be empty');
 
 const groupParticipantsValidor = body('participants')
-  .isArray({ min: 3 })
+  .isArray({ min: 2 })
   .withMessage('Participants must be an array and min 3 people')
   .notEmpty()
   .withMessage('Participants array cannot be empty');

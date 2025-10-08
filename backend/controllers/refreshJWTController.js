@@ -7,7 +7,6 @@ const handleJWTRefresh = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     try {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-      console.log({ decoded });
       const user = await User.findOne({ email: decoded.email });
 
       if (user.refresh_token !== refreshToken)
@@ -19,16 +18,15 @@ const handleJWTRefresh = async (req, res) => {
         id: decoded.id,
       });
 
+      user.refresh_token = _refreshToken;
+      await user.save();
+
       res.cookie('refreshToken', _refreshToken, {
         httpOnly: true,
         secure: false,
         sameSite: 'Lax',
         maxAge: 24 * 60 * 60 * 1000,
       });
-
-      user.refresh_token = _refreshToken;
-      await user.save();
-      console.log('access token renewed');
       return res.status(200).json({ message: 'Successful accessToken renewal', accessToken });
     } catch (err) {
       if (err.name === 'TokenExpiredError') {

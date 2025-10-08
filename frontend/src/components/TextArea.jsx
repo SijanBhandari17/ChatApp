@@ -94,21 +94,30 @@ const TextArea = () => {
 
   if (messages.length === 0) {
     return (
-      <div className="bg-muted/20 flex flex-1 items-center justify-center">
-        <div className="text-center">
-          <MessageSquare className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
-          <h3 className="mb-2 text-lg">Start your conversation</h3>
-          <p className="text-muted-foreground">Send a message to get the conversation started!</p>
+      <>
+        <div className="bg-muted/20 flex flex-1 items-center justify-center">
+          <div className="text-center">
+            <MessageSquare className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+            <h3 className="mb-2 text-lg">Start your conversation</h3>
+            <p className="text-muted-foreground">Send a message to get the conversation started!</p>
+          </div>
         </div>
-      </div>
+        <MessageInput setMessage={setMessages} />
+      </>
     );
   }
+  console.log(selectedConversation);
 
   return (
     <>
       <div ref={containerRef} className="bg-muted/20 flex-1 overflow-y-auto p-4">
         <div className="mx-auto max-w-4xl space-y-4">
           {messages.map(message => {
+            const senderName = selectedConversation.recipient?.find(
+              u => u._id === message.sender_id,
+            );
+            console.log(senderName?.userName);
+            console.log(selectedConversation.conversation_type);
             return (
               <div
                 key={message._id}
@@ -124,7 +133,12 @@ const TextArea = () => {
                         : 'border-border bg-card border'
                     }`}
                   >
-                    <p className="break-words">{message.content}</p>
+                    <div>
+                      {selectedConversation.conversation_type === 'group' && (
+                        <p className="mb-1 text-xs opacity-70">{senderName?.userName}</p>
+                      )}
+                      <p className="break-words">{message.content}</p>
+                    </div>
                   </div>
 
                   <div className="mt-1 flex items-center gap-1 px-3">
@@ -154,7 +168,6 @@ const TextArea = () => {
         </div>
         <div ref={bottomRef} /> {/* marker */}
       </div>
-
       <MessageInput setMessage={setMessages} />
     </>
   );
