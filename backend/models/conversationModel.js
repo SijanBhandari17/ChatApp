@@ -14,7 +14,7 @@ const createConversationSchema = new mongoose.Schema(
     last_message: {
       message_id: { type: mongoose.Schema.Types.ObjectId, ref: 'message' },
       content: { type: String },
-      message_type: { type: String, enum: ['text', 'image', 'video', 'file'] },
+      message_type: { type: String, enum: ['text', 'mixed', 'image', 'video', 'file'] },
       createdAt: { type: Date },
     },
     group_image: { type: String },

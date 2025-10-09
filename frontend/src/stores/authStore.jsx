@@ -5,6 +5,15 @@ const useAuthStore = create((set, store) => ({
   user: null,
   loading: true,
   setUser: user => set({ user }),
+
+  updateUser: profileLink =>
+    set(state => ({
+      user: {
+        ...state.user,
+        profile_image_url: profileLink,
+      },
+    })),
+
   setLoading: loading => set({ loading }),
 
   login: async userData => {
@@ -28,7 +37,9 @@ const useAuthStore = create((set, store) => ({
   },
 
   resetUser: () => {
-    set(store.getInitialState);
+    set({
+      user: null,
+    });
   },
 }));
 
@@ -44,6 +55,7 @@ const useAuth = () => {
     setLoading,
     initAuth,
     resetUser,
+    updateUser,
   } = useAuthStore();
   return {
     user,
@@ -56,6 +68,7 @@ const useAuth = () => {
     setLoading,
     initAuth,
     resetUser,
+    updateUser,
   };
 };
 

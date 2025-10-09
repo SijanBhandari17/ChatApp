@@ -32,7 +32,6 @@ const getConversations = async (req, res) => {
         },
       },
     ]);
-    console.log(usersConversations);
 
     return res.status(200).json({
       message: 'Conversations returned successfully',

@@ -23,10 +23,17 @@ const conversationStore = create((set, store) => ({
   },
 
   sendDirectMessage: async messageData => {
-    return await api.post('/messages/send/direct', messageData);
+    return await api.post('/messages/send/direct', messageData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
   resetConversation: () => {
-    set(store.getInitiailState());
+    set({
+      conversations: null,
+      selectedConversation: null,
+    });
   },
 }));
 

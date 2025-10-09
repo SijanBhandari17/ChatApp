@@ -1,8 +1,9 @@
 import 'dotenv/config';
-import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { rateLimiter } from './utils/rateLimiter.js';
+import { app, server } from './config/server.js';
+import express from 'express';
 
 import connectDb from './config/database.js';
 
@@ -20,8 +21,8 @@ import MessageRouter from './routes/messagesRouter.js';
 import { initializeRedisClient } from './config/redis.js';
 import helmetConfig from './config/helment.js';
 import DashboardRouter from './routes/dashboardRouter.js';
-
-const app = express();
+import ProfileImageRouter from './routes/profileImageRouter.js';
+import socketHandler from './sockets/socketHandler.js';
 
 app.use(cors(options));
 app.use(express.json());
@@ -42,16 +43,19 @@ app.use('/search', SearchRouter);
 app.use('/conversation', ConversationRouter);
 app.use('/messages', MessageRouter);
 app.use('/dashboard', DashboardRouter);
+app.use('/upload/', ProfileImageRouter);
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error('here', err);
+  return res.status(400).json({ error: err.message });
 });
 
 async function startServer() {
   try {
     await connectDb();
     await initializeRedisClient();
-    app.listen(process.env.PORT || 3000, () =>
+    socketHandler();
+    server.listen(process.env.PORT || 3000, () =>
       console.log(`Server running on port ${process.env.PORT || 3000}`),
     );
   } catch (err) {
