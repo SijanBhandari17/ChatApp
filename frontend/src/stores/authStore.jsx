@@ -37,7 +37,9 @@ const useAuthStore = create((set, store) => ({
   },
 
   resetUser: () => {
-    set(store.getInitialState);
+    set({
+      user: null,
+    });
   },
 }));
 

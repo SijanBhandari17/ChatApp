@@ -116,8 +116,6 @@ const TextArea = () => {
             const senderName = selectedConversation.recipient?.find(
               u => u._id === message.sender_id,
             );
-            console.log(senderName?.userName);
-            console.log(selectedConversation.conversation_type);
             return (
               <div
                 key={message._id}
@@ -126,20 +124,30 @@ const TextArea = () => {
                 <div
                   className={`flex max-w-[70%] flex-col ${message.sender_id === user._id ? 'items-end' : 'items-start'}`}
                 >
-                  <div
-                    className={`rounded-2xl px-4 py-2 ${
-                      message.sender_id === user._id
-                        ? 'bg-primary text-primary-foreground'
-                        : 'border-border bg-card border'
-                    }`}
-                  >
-                    <div>
-                      {selectedConversation.conversation_type === 'group' && (
-                        <p className="mb-1 text-xs opacity-70">{senderName?.userName}</p>
-                      )}
-                      <p className="break-words">{message.content}</p>
+                  {message.content?.length > 0 && (
+                    <div
+                      className={`rounded-2xl px-4 py-2 ${
+                        message.sender_id === user._id
+                          ? 'bg-primary text-primary-foreground'
+                          : 'border-border bg-card border'
+                      } ${message.attachments?.length > 0 && 'mb-2'}`}
+                    >
+                      <div>
+                        {selectedConversation.conversation_type === 'group' && (
+                          <p className="mb-1 text-xs opacity-70">{senderName?.userName}</p>
+                        )}
+                        <p className="break-words">{message?.content}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {message.attachments?.length > 0 && (
+                    <div className="flex space-x-2">
+                      {message.attachments.map((a, i) => {
+                        return <img key={i} src={a.url} alt="" className="mb-2 max-h-45" />;
+                      })}
+                    </div>
+                  )}
 
                   <div className="mt-1 flex items-center gap-1 px-3">
                     <span className="text-muted-foreground text-xs">

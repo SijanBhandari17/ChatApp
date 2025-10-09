@@ -43,7 +43,10 @@ const SideBar = () => {
                   <>
                     <Avatar className="h-12 w-12">
                       {chat.recipient ? (
-                        <AvatarImage src={chat.recipient[0]?.profile_image_url} />
+                        <AvatarImage
+                          className="object-cover"
+                          src={chat.recipient[0]?.profile_image_url}
+                        />
                       ) : null}
                       <AvatarFallback className="bg-black/10">
                         {chat.recipient[0]?.userName?.[0]?.toUpperCase()}
@@ -56,7 +59,9 @@ const SideBar = () => {
                 ) : (
                   <>
                     <Avatar className="h-12 w-12">
-                      {chat.recipient ? <AvatarImage src={chat.group_image} /> : null}
+                      {chat.recipient ? (
+                        <AvatarImage className="object-cover" src={chat.group_image} />
+                      ) : null}
                       <AvatarFallback className="bg-black/10">
                         {chat.title?.[0]?.toUpperCase()}
                       </AvatarFallback>
@@ -79,7 +84,9 @@ const SideBar = () => {
                   </span>
                 </div>
                 <p className="text-muted-foreground truncate text-sm">
-                  {chat.last_message?.content}
+                  {chat.last_message?.content
+                    ? chat.last_message?.content
+                    : chat.last_message?.message_type}
                 </p>
               </div>
 

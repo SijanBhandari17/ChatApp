@@ -57,7 +57,10 @@ const ChatHeader = () => {
             <>
               <Avatar className="h-10 w-10">
                 {selectedConversation.recipient ? (
-                  <AvatarImage src={selectedConversation.recipient[0]?.profile_image_url} />
+                  <AvatarImage
+                    className="object-cover"
+                    src={selectedConversation.recipient[0]?.profile_image_url}
+                  />
                 ) : null}
                 <AvatarFallback>
                   {selectedConversation.recipient[0]?.userName?.[0]?.toUpperCase()}
@@ -80,7 +83,10 @@ const ChatHeader = () => {
             <>
               <Avatar className="h-10 w-10">
                 {selectedConversation.recipient ? (
-                  <AvatarImage src={selectedConversation.recipient?.profile_image} />
+                  <AvatarImage
+                    className="object-cover"
+                    src={selectedConversation.recipient?.profile_image}
+                  />
                 ) : null}
                 <AvatarFallback>{selectedConversation.title?.[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>

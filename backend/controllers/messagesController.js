@@ -1,32 +1,68 @@
 import mongoose from 'mongoose';
 import Conversation from '../models/conversationModel.js';
 import Message from '../models/messageModel.js';
+import { cloudinary } from '../config/cloudinary.js';
 
 const handleMessageSend = async (req, res) => {
   const { conversation_id, sender_id, content, message_type } = req.body;
+  const files = req.files;
+  console.log({ content });
 
-  if (!conversation_id || !sender_id || !content || !message_type) {
+  if (!conversation_id || !sender_id || !message_type) {
     return res.status(400).json({
       error: 'Missing required fields',
     });
   }
+
   const session = await mongoose.startSession();
   session.startTransaction();
+  let attachments = [];
 
   try {
+    if (files) {
+      const uploadPromise = files.map(async file => {
+        const file_type = file.mimetype.startsWith('/image/') ? 'image' : 'video';
+        const file_size = file.size / (1024 * 1024);
+        const file_name = file.name;
+        const mime_type = file.mimetype;
+
+        const b64 = Buffer.from(file.buffer).toString('base64');
+        const dataURI = `data:${file.mimetype};base64,${b64}`;
+
+        const result = await cloudinary.uploader.upload(dataURI, {
+          folder: 'messageResource',
+          resource_type: 'image',
+        });
+
+        const url = result.secure_url;
+        const public_id = result.public_id;
+        return {
+          url,
+          public_id,
+          file_name,
+          file_size,
+          file_type,
+          mime_type,
+        };
+      });
+      attachments = await Promise.all(uploadPromise);
+    }
     const messageResult = await Message.create({
       conversation_id,
       sender_id,
-      content,
+      content: content || '',
       message_type,
+      attachments,
     });
     const messageObject = messageResult.toObject();
+    console.log(messageObject);
 
     const lastMessage = {
       message_type: messageObject.message_type,
       content: messageObject.content,
       createdAt: messageObject.createdAt,
       message_id: messageObject._id,
+      attachments,
     };
 
     await Conversation.findByIdAndUpdate(conversation_id, {
