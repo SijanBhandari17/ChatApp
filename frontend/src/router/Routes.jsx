@@ -9,8 +9,6 @@ import ResetPasswordForm from '@/components/ResetPasswordForm';
 import DashBoard from '@/pages/DashboardPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
-import { useEffect } from 'react';
-import { closeConnection, initConnection } from '@/sockets/socketConn';
 
 const router = createBrowserRouter([
   {
@@ -49,12 +47,5 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  useEffect(() => {
-    initConnection();
-    return () => {
-      closeConnection();
-    };
-  }, []);
-
   return <RouterProvider router={router} />;
 }

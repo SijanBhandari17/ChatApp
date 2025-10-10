@@ -1,13 +1,10 @@
 import 'dotenv/config';
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { rateLimiter } from './utils/rateLimiter.js';
 import { app, server } from './config/server.js';
 import express from 'express';
 
 import connectDb from './config/database.js';
-
-import options from './config/cors.js';
 
 import RegisterRouter from './routes/registerRoutes.js';
 import LoginRouter from './routes/loginRoutes.js';
@@ -22,16 +19,13 @@ import { initializeRedisClient } from './config/redis.js';
 import helmetConfig from './config/helment.js';
 import DashboardRouter from './routes/dashboardRouter.js';
 import ProfileImageRouter from './routes/profileImageRouter.js';
-import socketHandler from './sockets/socketHandler.js';
+import initSocket from './sockets/socketHandler.js';
 
-app.use(cors(options));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(rateLimiter);
 app.use(helmetConfig);
-
-connectDb();
 
 app.use('/register', RegisterRouter);
 app.use('/login', LoginRouter);
@@ -54,7 +48,7 @@ async function startServer() {
   try {
     await connectDb();
     await initializeRedisClient();
-    socketHandler();
+    initSocket();
     server.listen(process.env.PORT || 3000, () =>
       console.log(`Server running on port ${process.env.PORT || 3000}`),
     );
