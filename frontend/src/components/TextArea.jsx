@@ -106,7 +106,6 @@ const TextArea = () => {
       </>
     );
   }
-  console.log(selectedConversation);
 
   return (
     <>
