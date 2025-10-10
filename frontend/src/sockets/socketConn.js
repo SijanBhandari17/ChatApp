@@ -15,7 +15,6 @@ export const initConnection = () => {
       token: getFromLocalStorage('accessToken'),
     },
   });
-  console.log(getFromLocalStorage('accessToken'));
 
   socket.on('connect', () => {
     console.log('Connected:', socket.id);
@@ -26,7 +25,7 @@ export const initConnection = () => {
   });
 
   socket.on('connect_error', err => {
-    console.error('❌ Connection error:', err.message);
+    console.error('Connection error:', err.message);
   });
 
   return socket;

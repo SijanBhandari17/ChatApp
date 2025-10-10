@@ -26,7 +26,8 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     if (
       error.response?.status === 401 &&
-      error.response?.data?.error === 'Access Token Expired' &&
+      (error.response?.data?.error === 'Access Token Expired' ||
+        error.response?.data?.error === 'No token provided') &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;

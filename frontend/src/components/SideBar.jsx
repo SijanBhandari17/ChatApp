@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import useConversation from '@/stores/conversationStore';
 
 const SideBar = () => {
@@ -77,9 +77,7 @@ const SideBar = () => {
                   </p>
                   <span className="text-muted-foreground text-xs">
                     {chat.last_message?.createdAt
-                      ? formatDistanceToNow(new Date(chat.last_message?.createdAt), {
-                          addSuffix: true,
-                        })
+                      ? format(new Date(chat.last_message.createdAt), 'HH:mm')
                       : ''}
                   </span>
                 </div>

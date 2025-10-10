@@ -2,10 +2,11 @@ import Picker from 'emoji-picker-react';
 import { Button } from './ui/button';
 import { Paperclip, Send, Smile, X } from 'lucide-react';
 import { Textarea } from './ui/textarea';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useConversation from '@/stores/conversationStore';
 import useAuth from '@/stores/authStore';
 import { Input } from './ui/input';
+import { getSocket } from '@/sockets/socketConn';
 
 const MessageInput = ({ setMessage, bottomRef }) => {
   const { selectedConversation, sendDirectMessage, updateConversations } = useConversation();
@@ -15,6 +16,13 @@ const MessageInput = ({ setMessage, bottomRef }) => {
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+
+  // useEffect(() => {
+  //   const socket = getSocket();
+  //   socket.on('new_message', message => {
+  //     setMessage(prev => [...prev, ...message]);
+  //   });
+  // }, []);
 
   const handleMessageSend = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
@@ -48,8 +56,10 @@ const MessageInput = ({ setMessage, bottomRef }) => {
       console.log(formData);
 
       const response = await sendDirectMessage(formData);
+      // socket.emit('send-message', formData);
       setMessage(prev => [...prev, response.data.body]);
       updateConversations(selectedConversation._id, response.data.body);
+      const socket = getSocket();
 
       setInputMessage('');
       setFiles([]);

@@ -2,11 +2,19 @@ import SideBar from '@/components/SideBar';
 import Header from '@/components/Header';
 import MessageArea from '@/components/MessageArea';
 import { useEffect } from 'react';
-import { closeConnection, initConnection } from '@/sockets/socketConn';
+import { closeConnection, getSocket, initConnection } from '@/sockets/socketConn';
+import useAuth from '@/stores/authStore';
 
 const DashBoard = () => {
+  const { user } = useAuth();
   useEffect(() => {
-    initConnection();
+    if (user) {
+      initConnection();
+    }
+    setInterval(() => {
+      const socket = getSocket();
+      socket.emit('heartbeat');
+    }, 30 * 1000);
     return () => {
       closeConnection();
     };

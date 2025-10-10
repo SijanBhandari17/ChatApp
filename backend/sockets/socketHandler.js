@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { io } from '../config/server.js';
 import 'dotenv/config';
+import { redisClient } from '../config/redis.js';
+import setLastSeen from '../utils/setLastSeen.js';
 
 const initSocket = () => {
   io.use(async (socket, next) => {
-    console.log('[SOCKET AUTH] New socket attempting connection...');
-
     try {
       const token = socket.handshake.auth?.token;
       if (!token) {
@@ -38,12 +38,32 @@ const initSocket = () => {
   });
 
   io.on('connection', socket => {
-    console.log('Socket ID:', socket.id);
+    const userId = socket.userId;
+    socket.userId = userId;
 
-    socket.emit('server_message', { msg: 'Connected to the socket server' });
+    redisClient.set(`online:${userId}`, 'true', { EX: 60 });
 
-    socket.on('disconnect', reason => {
-      console.log(`User disconnected (${socket.userId || 'unknown'}). Reason:`, reason);
+    socket.on('disconnect', async () => {
+      redisClient.del(`online:${socket.userId}`);
+      await setLastSeen(userId);
+    });
+
+    socket.on('heartbeat', () => {
+      redisClient.set(`online:${socket.userId}`, 'true');
+      redisClient.expire(`online:${socket.userId}`, 30);
+    });
+
+    socket.on('get-user-status', async ({ userId }) => {
+      try {
+        const isOnline = await redisClient.exists(`online:${userId}`);
+
+        socket.emit('user-status-response', {
+          userId,
+          isOnline: !!isOnline,
+        });
+      } catch (err) {
+        console.error('Error fetching user status:', err);
+      }
     });
   });
 
