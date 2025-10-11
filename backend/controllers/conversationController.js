@@ -12,13 +12,13 @@ const getOrCreateDirectConversation = async (req, res) => {
   const { participants } = matchedData(req);
 
   try {
-    const existingId = await checkConversationCache(participants);
-    if (existingId) {
-      return res.status(200).json({
-        message: 'Conversation id found',
-        body: { conversation_id: JSON.parse(existingId) },
-      });
-    }
+    // const existingId = await checkConversationCache(participants);
+    // if (existingId) {
+    //   return res.status(200).json({
+    //     message: 'Conversation id found',
+    //     body: { conversation_id: JSON.parse(existingId) },
+    //   });
+    // }
 
     const existingConversation = await Conversation.findOne({
       participants: {
@@ -34,7 +34,7 @@ const getOrCreateDirectConversation = async (req, res) => {
       await redisClient.set(key, JSON.stringify(existingConversation._id));
       return res.status(200).json({
         message: 'Conversation id found',
-        body: { conversation_id: JSON.parse(existingConversation._id) },
+        body: { conversation_id: JSON.parse(existingConversation.toObject()) },
       });
     }
 
@@ -47,10 +47,10 @@ const getOrCreateDirectConversation = async (req, res) => {
     await redisClient.set(key, JSON.stringify(newConversation._id));
     return res.status(200).json({
       message: 'Conversation id found',
-      body: { conversation_id: newConversation._id.toString() },
+      body: { conversation_id: newConversation.toObject() },
     });
   } catch (err) {
-    return res.status(500).json({ error: `An error occurred here: ${err.message}` });
+    return res.status(500).json({ error: `An error occurred : ${err.message}` });
   }
 };
 

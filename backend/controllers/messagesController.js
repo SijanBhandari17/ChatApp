@@ -81,7 +81,6 @@ const handleMessageSend = async ({
     });
     await session.commitTransaction();
     session.endSession();
-
     return messageObject;
   } catch (err) {
     await session.abortTransaction();
