@@ -8,11 +8,23 @@ const conversationStore = create((set, store) => ({
   setSelectedConversation: selectedConversation => set({ selectedConversation }),
 
   updateConversations: (id, message) =>
-    set(state => ({
-      conversations: state.conversations.map(conversation =>
-        conversation._id === id ? { ...conversation, last_message: message } : conversation,
-      ),
-    })),
+    set(state => {
+      const index = state.conversations.findIndex(c => c._id === id);
+      if (index === -1) return state;
+
+      const updatedConv = {
+        ...state.conversations[index],
+        last_message: message,
+      };
+
+      const newConversations = [
+        updatedConv,
+        ...state.conversations.slice(0, index),
+        ...state.conversations.slice(index + 1),
+      ];
+
+      return { conversations: newConversations };
+    }),
 
   getConversations: async () => {
     return await api.get('/dashboard/conversations');

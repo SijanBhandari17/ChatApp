@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { handleMessageGet, handleMessageSend } from '../controllers/messagesController.js';
+import { handleFileUpload, handleMessageGet } from '../controllers/messagesController.js';
 import authenticateRequest from '../middleware/authenicateJWT.js';
 import upload from '../middleware/multerMiddleware.js';
 
 const MessageRouter = Router();
 
-MessageRouter.post('/send/direct', authenticateRequest, upload.any('files'), handleMessageSend);
-MessageRouter.post('/send/group', authenticateRequest, handleMessageSend);
+MessageRouter.post('/upload', authenticateRequest, upload.any('files'), handleFileUpload);
 MessageRouter.get('/', authenticateRequest, handleMessageGet);
 
 export default MessageRouter;

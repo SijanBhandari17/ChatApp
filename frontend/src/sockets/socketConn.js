@@ -18,6 +18,7 @@ export const initConnection = () => {
 
   socket.on('connect', () => {
     console.log('Connected:', socket.id);
+    socket.emit('join-room');
   });
 
   socket.on('disconnect', () => {

@@ -3,6 +3,7 @@ import { io } from '../config/server.js';
 import 'dotenv/config';
 import { redisClient } from '../config/redis.js';
 import setLastSeen from '../utils/setLastSeen.js';
+import { handleMessageSend } from '../controllers/messagesController.js';
 
 const initSocket = () => {
   io.use(async (socket, next) => {
@@ -63,6 +64,48 @@ const initSocket = () => {
         });
       } catch (err) {
         console.error('Error fetching user status:', err);
+      }
+    });
+
+    socket.on('send-message', async data => {
+      try {
+        const message = await handleMessageSend(data);
+
+        // Log sender info
+        console.log(`Message from user ${socket.userId}:`, message);
+
+        // Emit to each participant
+        data.participants.forEach(participant => {
+          const recipientId = participant.user_id;
+
+          // Check if recipient room exists and has members
+          const room = io.sockets.adapter.rooms.get(recipientId);
+
+          if (room) {
+            console.log(`Emitting to user ${recipientId}, room has ${room.size} connection(s)`);
+            io.to(recipientId).emit('receive-message', { message });
+          } else {
+            console.log(` User ${recipientId} not connected (room doesn't exist)`);
+            // User is offline, message already saved to DB
+          }
+        });
+      } catch (err) {
+        console.log('Error sending message:', err);
+      }
+    });
+
+    // Verify room join
+    socket.on('join-room', () => {
+      console.log('userId', socket.userId);
+      socket.join(socket.userId);
+
+      // Confirm the join was successful
+      const room = io.sockets.adapter.rooms.get(socket.userId);
+      if (room && room.has(socket.id)) {
+        console.log(` User ${socket.userId} successfully joined their room`);
+        console.log(`   Room has ${room.size} connection(s)`);
+      } else {
+        console.log(` Failed to join room for user ${socket.userId}`);
       }
     });
   });
