@@ -5,6 +5,7 @@ import useAuth from '@/stores/authStore';
 import MessageAreaSkeleton from './MessageSkeletion';
 import { formatRelative } from 'date-fns';
 import MessageInput from './MessageInput';
+import { getSocket } from '@/sockets/socketConn';
 
 const TextArea = () => {
   const containerRef = useRef(null);
@@ -106,7 +107,6 @@ const TextArea = () => {
       </>
     );
   }
-  console.log(selectedConversation);
 
   return (
     <>

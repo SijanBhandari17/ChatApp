@@ -2,13 +2,15 @@ import Picker from 'emoji-picker-react';
 import { Button } from './ui/button';
 import { Paperclip, Send, Smile, X } from 'lucide-react';
 import { Textarea } from './ui/textarea';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useConversation from '@/stores/conversationStore';
 import useAuth from '@/stores/authStore';
 import { Input } from './ui/input';
+import { getSocket } from '@/sockets/socketConn';
+import { api } from '@/lib/axiosConfig';
 
 const MessageInput = ({ setMessage, bottomRef }) => {
-  const { selectedConversation, sendDirectMessage, updateConversations } = useConversation();
+  const { selectedConversation, updateConversations } = useConversation();
   const { user } = useAuth();
   const [inputMessage, setInputMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
@@ -16,21 +18,38 @@ const MessageInput = ({ setMessage, bottomRef }) => {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
 
+  useEffect(() => {
+    const socket = getSocket();
+    const handleReceiveMessage = ({ message }) => {
+      console.log(message);
+      if (message.conversation_id === selectedConversation._id)
+        setMessage(prev => [...prev, message]);
+
+      updateConversations(message.conversation_id, message);
+
+      setTimeout(() => {
+        bottomRef?.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    };
+
+    socket.on('receive-message', handleReceiveMessage);
+
+    return () => {
+      socket.off('receive-message', handleReceiveMessage);
+    };
+  }, [selectedConversation?._id]);
+
   const handleMessageSend = async () => {
     if (!inputMessage.trim() && files.length === 0) return;
 
     try {
       const formData = new FormData();
-
-      formData.append('conversation_id', selectedConversation._id);
-      formData.append('sender_id', user._id);
-      formData.append('content', inputMessage);
-
       files.forEach(file => {
         formData.append('files', file);
       });
 
       let messageType = 'text';
+      let attachments;
       if (files.length > 0 && inputMessage.trim()) {
         setUploading(true);
         messageType = 'mixed';
@@ -43,21 +62,38 @@ const MessageInput = ({ setMessage, bottomRef }) => {
         else if (allVideos) messageType = 'videos';
         else messageType = 'file';
       }
+      if (files.length > 0) {
+        try {
+          const response = await api.post('messages/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          attachments = response.data?.body;
+          console.log(attachments);
+        } catch (err) {
+          console.log(err);
+        }
+      }
 
-      formData.append('message_type', messageType);
-      console.log(formData);
-
-      const response = await sendDirectMessage(formData);
-      setMessage(prev => [...prev, response.data.body]);
-      updateConversations(selectedConversation._id, response.data.body);
+      const socket = getSocket();
+      socket.emit('send-message', {
+        conversation_id: selectedConversation._id,
+        sender_id: user._id,
+        content: inputMessage,
+        attachments,
+        message_type: messageType,
+        participants: selectedConversation.participants,
+      });
 
       setInputMessage('');
       setFiles([]);
       setUploading(false);
       setTimeout(() => {
+        console.log(bottomRef);
         bottomRef?.current?.scrollIntoView({ behavior: 'smooth' });
+        console.log('sarena');
       }, 100);
-      console.log(response.data.body);
     } catch (err) {
       console.error(err);
     }

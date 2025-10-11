@@ -11,6 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { getSocket } from '@/sockets/socketConn';
+import { useEffect, useState } from 'react';
 
 const CallIcons = () => {
   return (
@@ -49,6 +51,33 @@ const CallIcons = () => {
 
 const ChatHeader = () => {
   const { selectedConversation } = useConversation();
+  const [onlineStatus, setOnlineStatus] = useState(false);
+
+  useEffect(() => {
+    if (selectedConversation.conversation_type !== 'direct') return;
+
+    const socket = getSocket();
+    const recipientId = selectedConversation.recipient?.[0]?._id;
+    if (!recipientId) return;
+
+    socket.emit('get-user-status', { userId: recipientId });
+    socket.emit('join-conversation', {
+      conversationId: selectedConversation._id,
+    });
+
+    const handleStatusResponse = data => {
+      if (data.userId === recipientId) {
+        setOnlineStatus(data.isOnline);
+      }
+    };
+
+    socket.on('user-status-response', handleStatusResponse);
+
+    return () => {
+      socket.off('user-status-response', handleStatusResponse);
+    };
+  }, [selectedConversation]);
+
   return (
     <div className="border-border w-full flex-shrink-0 border-b p-2">
       <div className="flex items-center justify-between">
@@ -69,10 +98,9 @@ const ChatHeader = () => {
               <div>
                 <h2 className="font-semibold">{selectedConversation.recipient[0]?.userName}</h2>
                 <p className="text-muted-foreground text-sm">
-                  {selectedConversation.conversation_type === 'direct' &&
-                  selectedConversation.recipient?.notActive
+                  {selectedConversation.conversation_type === 'direct' && onlineStatus
                     ? 'Online'
-                    : `Last seen at ${formatRelative(
+                    : `Last seen ${formatRelative(
                         new Date(selectedConversation.recipient[0].last_active_at),
                         new Date(),
                       )}`}

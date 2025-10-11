@@ -23,6 +23,6 @@ async function getUsers(userEmail) {
   }
 }
 
-const inputDeboucer = debouncer(getUsers, 500);
+const inputDeboucer = debouncer(getUsers, 750);
 
 export { inputDeboucer };

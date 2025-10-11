@@ -3,23 +3,11 @@ import Conversation from '../models/conversationModel.js';
 import Message from '../models/messageModel.js';
 import { cloudinary } from '../config/cloudinary.js';
 
-const handleMessageSend = async (req, res) => {
-  const { conversation_id, sender_id, content, message_type } = req.body;
+const handleFileUpload = async (req, res) => {
   const files = req.files;
-  console.log({ content });
-
-  if (!conversation_id || !sender_id || !message_type) {
-    return res.status(400).json({
-      error: 'Missing required fields',
-    });
-  }
-
-  const session = await mongoose.startSession();
-  session.startTransaction();
   let attachments = [];
-
-  try {
-    if (files) {
+  if (files) {
+    try {
       const uploadPromise = files.map(async file => {
         const file_type = file.mimetype.startsWith('/image/') ? 'image' : 'video';
         const file_size = file.size / (1024 * 1024);
@@ -46,7 +34,30 @@ const handleMessageSend = async (req, res) => {
         };
       });
       attachments = await Promise.all(uploadPromise);
+      return res.status(201).json({ body: attachments });
+    } catch (err) {
+      return res.status(500).json({ error: `An  error occurred: ${err.message}` });
     }
+  }
+};
+
+const handleMessageSend = async ({
+  conversation_id,
+  sender_id,
+  content,
+  attachments,
+  message_type,
+}) => {
+  if (!conversation_id || !sender_id || !message_type) {
+    return res.status(400).json({
+      error: 'Missing required fields',
+    });
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
     const messageResult = await Message.create({
       conversation_id,
       sender_id,
@@ -70,12 +81,11 @@ const handleMessageSend = async (req, res) => {
     });
     await session.commitTransaction();
     session.endSession();
-
-    return res.status(201).json({ message: 'successful message creation', body: messageObject });
+    return messageObject;
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
-    return res.status(500).json({ error: `An  error occurred: ${err.message}` });
+    return err;
   }
 };
 
@@ -114,4 +124,4 @@ const handleMessageGet = async (req, res) => {
   }
 };
 
-export { handleMessageSend, handleMessageGet };
+export { handleMessageSend, handleMessageGet, handleFileUpload };
