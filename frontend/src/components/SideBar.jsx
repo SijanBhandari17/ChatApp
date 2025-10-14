@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import useConversation from '@/stores/conversationStore';
+import useFilterStore from '@/stores/filterStore';
+import { api } from '@/lib/axiosConfig';
+import useAuth from '@/stores/authStore';
 
 const SideBar = () => {
   const {
@@ -12,6 +15,8 @@ const SideBar = () => {
     setSelectedConversation,
     selectedConversation,
   } = useConversation();
+  const { filteredUser, setFilteredUser } = useFilterStore();
+  const { user } = useAuth();
 
   useEffect(() => {
     const getUserConversations = async () => {
@@ -25,11 +30,66 @@ const SideBar = () => {
     getUserConversations();
   }, [getConversations, setConversations]);
 
+  const handleUserClick = async selectedUser => {
+    try {
+      const response = await api.post('/conversation/direct', {
+        participants: [selectedUser._id, user._id],
+      });
+      setFilteredUser([]);
+      setSelectedConversation({ ...response.data.body.conversation, recipient: [selectedUser] });
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  if (filteredUser?.length > 0) {
+    return (
+      <aside className="border-border flex w-80 flex-col overflow-hidden border-r">
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-2">
+            {filteredUser?.map(chat => (
+              <div
+                key={chat._id}
+                onClick={() => handleUserClick(chat)}
+                className={`hover:bg-sidebar mb-1 flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors ${
+                  selectedConversation === chat ? 'bg-sidebar-accent' : ''
+                }`}
+              >
+                <div className="relative">
+                  <Avatar className="h-12 w-12">
+                    {chat.profile_image_url ? (
+                      <AvatarImage className="object-cover" src={chat?.profile_image_url} />
+                    ) : null}
+                    <AvatarFallback className="bg-black/10">
+                      {chat?.userName?.[0]?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-col items-start">
+                    <p className="truncate font-medium">{chat.userName}</p>
+                    <p className="text-muted-foreground truncate">{chat.email}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside className="border-border flex w-80 flex-col overflow-hidden border-r">
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
-          <h3 className="text-muted-foreground px-2 py-3 text-sm font-medium">Recent Chats</h3>
+          {conversations?.length > 0 ? (
+            <h3 className="text-muted-foreground px-2 py-3 text-sm font-medium">Recent Chats</h3>
+          ) : (
+            <p className="text-muted-foreground text-center">It's quiet around here</p>
+          )}
           {conversations?.map(chat => (
             <div
               key={chat._id}
@@ -52,9 +112,6 @@ const SideBar = () => {
                         {chat.recipient[0]?.userName?.[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    {chat.isOnline && (
-                      <div className="border-background absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 bg-green-500"></div>
-                    )}
                   </>
                 ) : (
                   <>

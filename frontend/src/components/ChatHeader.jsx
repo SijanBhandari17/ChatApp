@@ -77,31 +77,32 @@ const ChatHeader = () => {
       socket.off('user-status-response', handleStatusResponse);
     };
   }, [selectedConversation]);
+  console.log({ selectedConversation });
 
   return (
     <div className="border-border w-full flex-shrink-0 border-b p-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {selectedConversation.conversation_type === 'direct' ? (
+          {selectedConversation?.conversation_type === 'direct' ? (
             <>
               <Avatar className="h-10 w-10">
-                {selectedConversation.recipient ? (
+                {selectedConversation?.recipient ? (
                   <AvatarImage
                     className="object-cover"
-                    src={selectedConversation.recipient[0]?.profile_image_url}
+                    src={selectedConversation?.recipient[0]?.profile_image_url}
                   />
                 ) : null}
                 <AvatarFallback>
-                  {selectedConversation.recipient[0]?.userName?.[0]?.toUpperCase()}
+                  {selectedConversation?.recipient[0]?.userName?.[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold">{selectedConversation.recipient[0]?.userName}</h2>
+                <h2 className="font-semibold">{selectedConversation?.recipient?.[0]?.userName}</h2>
                 <p className="text-muted-foreground text-sm">
-                  {selectedConversation.conversation_type === 'direct' && onlineStatus
+                  {selectedConversation?.conversation_type === 'direct' && onlineStatus
                     ? 'Online'
                     : `Last seen ${formatRelative(
-                        new Date(selectedConversation.recipient[0].last_active_at),
+                        new Date(selectedConversation?.recipient[0].last_active_at),
                         new Date(),
                       )}`}
                 </p>
@@ -113,10 +114,10 @@ const ChatHeader = () => {
                 {selectedConversation.recipient ? (
                   <AvatarImage
                     className="object-cover"
-                    src={selectedConversation.recipient?.profile_image}
+                    src={selectedConversation?.recipient?.profile_image}
                   />
                 ) : null}
-                <AvatarFallback>{selectedConversation.title?.[0]?.toUpperCase()}</AvatarFallback>
+                <AvatarFallback>{selectedConversation?.title?.[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
                 <h2 className="font-semibold">{selectedConversation.title}</h2>

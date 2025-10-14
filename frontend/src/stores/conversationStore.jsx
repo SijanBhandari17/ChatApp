@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 import { api } from '@/lib/axiosConfig';
 
-const conversationStore = create((set, store) => ({
+const conversationStore = create(set => ({
   conversations: null,
   selectedConversation: null,
   setConversations: conversations => set({ conversations }),
   setSelectedConversation: selectedConversation => set({ selectedConversation }),
+
+  addConversation: newConversation =>
+    set(state => {
+      return { conversations: [newConversation, ...state.conversations] };
+    }),
 
   updateConversations: (id, message) =>
     set(state => {
@@ -60,6 +65,7 @@ const useConversation = () => {
     setSelectedConversation,
     resetConversation,
     updateConversations,
+    addConversation,
   } = conversationStore();
   return {
     conversations,
@@ -71,6 +77,7 @@ const useConversation = () => {
     setSelectedConversation,
     resetConversation,
     updateConversations,
+    addConversation,
   };
 };
 
