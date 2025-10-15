@@ -12,13 +12,13 @@ const getOrCreateDirectConversation = async (req, res) => {
   const { participants } = matchedData(req);
 
   try {
-    // const existingId = await checkConversationCache(participants);
-    // if (existingId) {
-    //   return res.status(200).json({
-    //     message: 'Conversation id found',
-    //     body: { conversation_id: JSON.parse(existingId) },
-    //   });
-    // }
+    const existingId = await checkConversationCache(participants);
+    if (existingId) {
+      return res.status(200).json({
+        message: 'Conversation id found',
+        body: { conversation: JSON.parse(existingId) },
+      });
+    }
 
     const existingConversation = await Conversation.findOne({
       participants: {
@@ -27,14 +27,15 @@ const getOrCreateDirectConversation = async (req, res) => {
           { $elemMatch: { user_id: participants[1] } },
         ],
       },
+      conversation_type: { $ne: 'group' },
     });
 
     if (existingConversation) {
       const key = generateKey(participants);
-      await redisClient.set(key, JSON.stringify(existingConversation._id));
+      await redisClient.set(key, JSON.stringify(existingConversation), { EX: 3600 });
       return res.status(200).json({
         message: 'Conversation id found',
-        body: { conversation_id: JSON.parse(existingConversation.toObject()) },
+        body: { conversation: existingConversation.toObject() },
       });
     }
 
@@ -44,10 +45,10 @@ const getOrCreateDirectConversation = async (req, res) => {
     });
 
     const key = generateKey(participants);
-    await redisClient.set(key, JSON.stringify(newConversation._id));
+    await redisClient.set(key, JSON.stringify(newConversation));
     return res.status(200).json({
       message: 'Conversation id found',
-      body: { conversation_id: newConversation.toObject() },
+      body: { conversation: newConversation.toObject() },
     });
   } catch (err) {
     return res.status(500).json({ error: `An error occurred : ${err.message}` });

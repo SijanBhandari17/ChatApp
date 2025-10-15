@@ -8,7 +8,12 @@ const getConversations = async (req, res) => {
 
   try {
     const usersConversations = await Conversation.aggregate([
-      { $match: { 'participants.user_id': new mongoose.Types.ObjectId(userId) } },
+      {
+        $match: {
+          'participants.user_id': new mongoose.Types.ObjectId(userId),
+          last_message: { $ne: null },
+        },
+      },
       { $sort: { 'last_message.createdAt': -1 } },
       { $limit: 15 },
       {

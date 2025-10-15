@@ -16,15 +16,14 @@ import useConversation from '@/stores/conversationStore';
 import GroupChatForm from './GroupChat';
 import ProfilePicDialog from './ProfilePicDialog';
 import { inputDeboucer } from '@/lib/inputDebouncer';
-import { ScrollArea } from './ui/scroll-area';
 import { api } from '@/lib/axiosConfig';
+import useFilterStore from '@/stores/filterStore';
 
 const Header = () => {
   const { user, logout, setUser } = useAuth();
   const { resetConversation } = useConversation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchedUsers, setSearchedUser] = useState([]);
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const { setFilteredUser } = useFilterStore();
 
   const handleLogoutClick = async () => {
     try {
@@ -41,26 +40,13 @@ const Header = () => {
     const value = e.target.value;
     setSearchQuery(value);
     if (!value.trim()) {
-      setPopoverOpen(false);
-      setSearchedUser([]);
+      setFilteredUser([]);
       return;
     }
     try {
       const response = await inputDeboucer(value);
       if (!value || value !== e.target.value.trim()) return;
-      setSearchedUser(response);
-      setPopoverOpen(true);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const handleUserClick = async selectedUser => {
-    try {
-      const response = await api.post('/conversation/direct', {
-        participants: [selectedUser._id, user._id],
-      });
-      console.log(response);
-      setPopoverOpen(false);
+      setFilteredUser(response);
     } catch (err) {
       console.log(err);
     }
@@ -91,41 +77,10 @@ const Header = () => {
                 onChange={handleSearchUser}
                 className="border-border/50 bg-muted/50 focus:bg-background focus:border-primary/50 focus:ring-primary/20 h-10 w-full rounded-full pr-4 pl-10 transition-all focus:ring-2"
               />
-
-              {/* Search Results Dropdown */}
-              {popoverOpen && (
-                <div className="border-border/50 bg-popover animate-in fade-in-0 zoom-in-95 absolute top-full right-0 left-0 mt-2 overflow-y-auto rounded-xl border shadow-xl">
-                  <ScrollArea className="max-h-64 rounded-md border">
-                    {searchedUsers?.map(user => (
-                      <div
-                        key={user._id}
-                        className="hover:bg-accent flex cursor-pointer items-center gap-3 p-2 transition-colors"
-                        onClick={() => handleUserClick(user)}
-                      >
-                        <Avatar className="h-12 w-12">
-                          {user.profile_image ? (
-                            <AvatarImage src={user.profile_image} />
-                          ) : (
-                            <AvatarFallback className="bg-black/10">
-                              {user.userName?.[0]?.toUpperCase()}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{user.userName}</p>
-                          <p className="text-muted-foreground text-sm">{user.email}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </ScrollArea>
-                </div>
-              )}
             </div>
 
-            <div className="flex-1"></div>
-
             {/* User Profile Section */}
-            <div className="flex flex-shrink-0 items-center gap-2">
+            <div className="ml-auto flex flex-shrink-0 items-center gap-2">
               <div className="border-border/50 bg-muted/30 hover:bg-muted/50 hidden items-center gap-3 rounded-full border py-1 pr-3 pl-1 transition-all md:flex">
                 <Avatar className="border-background h-8 w-8 border-2 shadow-sm">
                   <AvatarImage src={user.profile_image_url} className="object-cover" />

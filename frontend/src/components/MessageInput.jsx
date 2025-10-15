@@ -10,7 +10,7 @@ import { getSocket } from '@/sockets/socketConn';
 import { api } from '@/lib/axiosConfig';
 
 const MessageInput = ({ setMessage, bottomRef }) => {
-  const { selectedConversation, updateConversations } = useConversation();
+  const { selectedConversation, addConversation, updateConversations } = useConversation();
   const { user } = useAuth();
   const [inputMessage, setInputMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
@@ -21,6 +21,9 @@ const MessageInput = ({ setMessage, bottomRef }) => {
   useEffect(() => {
     const socket = getSocket();
     const handleReceiveMessage = ({ message }) => {
+      if (!selectedConversation.last_message) {
+        addConversation(selectedConversation);
+      }
       console.log(message);
       if (message.conversation_id === selectedConversation._id)
         setMessage(prev => [...prev, message]);
@@ -90,9 +93,7 @@ const MessageInput = ({ setMessage, bottomRef }) => {
       setFiles([]);
       setUploading(false);
       setTimeout(() => {
-        console.log(bottomRef);
         bottomRef?.current?.scrollIntoView({ behavior: 'smooth' });
-        console.log('sarena');
       }, 100);
     } catch (err) {
       console.error(err);
