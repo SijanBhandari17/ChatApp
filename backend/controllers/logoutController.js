@@ -9,7 +9,7 @@ const handleLogout = async (req, res) => {
 
     res.clearCookie('refreshToken', {
       httpOnly: true,
-      sameSite: 'Lax',
+      sameSite: 'None',
       secure: true,
     });
     return res.status(200).json({ message: 'Logged out successfully' });

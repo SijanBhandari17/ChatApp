@@ -30,8 +30,8 @@ const handleOTP = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'Lax',
+      secure: true,
+      sameSite: 'None',
       maxAge: 24 * 60 * 60 * 1000,
     });
 

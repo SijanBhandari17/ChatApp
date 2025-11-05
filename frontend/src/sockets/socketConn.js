@@ -9,7 +9,8 @@ export const initConnection = () => {
     return socket;
   }
 
-  socket = io('http://localhost:3000', {
+  const serverURL = import.meta.env.VITE_API_URL;
+  socket = io(serverURL, {
     transports: ['websocket', 'polling'],
     auth: {
       token: getFromLocalStorage('accessToken'),

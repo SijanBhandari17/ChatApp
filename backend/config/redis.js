@@ -4,6 +4,7 @@ let redisClient;
 
 async function initializeRedisClient() {
   const redisURL = process.env.REDIS_URL;
+
   if (!redisURL) return console.warn('No Redis URL found in env!');
 
   redisClient = createClient({ url: redisURL });
