@@ -52,7 +52,6 @@ const getUserInfo = async (req, res) => {
   if (!userId) return res.status(400).json({ error: 'No user found' });
   try {
     const userInfo = await User.findById(userId, { password: 0, refresh_token: 0 });
-
     if (!userInfo) return res.status(404).json({ error: 'User not found' });
 
     return res.status(200).json({
