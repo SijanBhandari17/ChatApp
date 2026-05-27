@@ -73,3 +73,12 @@ ChatApp/
 | `npm start` | Start the development server |
 | `npm test` | Run tests |
 | `npm run build` | Build for production |
+
+
+## Deployment
+
+| Layer | Platform | Status |
+|---|---|---|
+| Frontend | Vercel | ✅ Live |
+| Backend | Railway | ~~Free tier ($5 credit/month)~~ — Credit expired |
+| Database | MongoDB Atlas | ✅ Live |
